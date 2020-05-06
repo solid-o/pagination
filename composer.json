@@ -1,0 +1,57 @@
+{
+    "name": "solido/pagination",
+    "description": "Pagination (and endless-pagination) utilities for REST apis",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alessandro Chitolina",
+            "email": "alekitto@gmail.com"
+        },
+        {
+            "name": "Massimiliano Braglia",
+            "email": "massimiliano.braglia@gmail.com"
+        }
+    ],
+    "scripts": {
+        "phpstan": "phpstan analyse src/ -c vendor/solido/php-coding-standards/phpstan.neon --level=8 --no-progress -vvv --memory-limit=2048M",
+        "cscheck": "vendor/bin/phpcs --standard=Solido src/",
+        "csfix": "vendor/bin/phpcbf --standard=Solido src/"
+    },
+    "require": {
+        "php": "^7.4",
+        "symfony/property-access": "^4.4|^5.0"
+    },
+    "require-dev": {
+        "cakephp/chronos": "^2.0",
+        "doctrine/annotations": "^1.10",
+        "doctrine/dbal": "^2.10",
+        "doctrine/orm": "^2.7",
+        "doctrine/phpcr-odm": "^1.5",
+        "jackalope/jackalope-doctrine-dbal": "^1.4",
+        "phpunit/phpunit": "^8.0|^9.0",
+        "refugis/doctrine-extra": "dev-master",
+        "refugis/elastica-odm": "dev-master",
+        "roave/security-advisories": "dev-master",
+        "solido/php-coding-standards": "dev-master",
+        "solido/test-utils": "dev-master",
+        "symfony/cache": "^4.4|^5.0",
+        "symfony/http-foundation": "^4.4|^5.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Solido\\Pagination\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Solido\\Pagination\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "archive": {
+        "exclude": [ ".gitignore", ".travis.yml", "tests" ]
+    }
+}
