@@ -14,7 +14,9 @@ use function explode;
 use function implode;
 use function is_numeric;
 use function Safe\base64_decode;
+use function Safe\preg_match;
 use function Safe\substr;
+use function strpos;
 
 /**
  * This class is the object representation of a ContinuousToken.
@@ -108,7 +110,7 @@ final class PageToken
 
         [$orderValue, $offset, $checksum] = $tokenSplit;
 
-        if ($orderValue[0] === '=') {
+        if (strpos($orderValue, '=') === 0) {
             $orderValue = base64_decode(substr($orderValue, 1));
         } else {
             $orderValue = (int) base_convert($tokenSplit[0], 36, 10);
@@ -122,12 +124,27 @@ final class PageToken
     }
 
     /**
+     * Check whether the token is valid or not.
+     */
+    public static function isValid(string $token): bool
+    {
+        $tokenSplit = explode(self::TOKEN_DELIMITER, $token);
+        if (count($tokenSplit) !== 3) {
+            return false;
+        }
+
+        [$orderValue] = $tokenSplit;
+
+        return strpos($orderValue, '=') === 0 || preg_match('/^[0-9a-z]*$/iu', $orderValue);
+    }
+
+    /**
      * Extract the token from the request and parses it.
      */
     public static function fromRequest(Request $request): ?self
     {
         $token = $request->query->get('continue');
-        if (empty($token)) {
+        if (empty($token) || ! self::isValid($token)) {
             return null;
         }
 
