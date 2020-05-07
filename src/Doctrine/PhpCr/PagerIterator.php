@@ -8,10 +8,10 @@ use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\PHPCR\DocumentManagerInterface;
 use Doctrine\ODM\PHPCR\Query\Builder\AbstractNode;
+use Doctrine\ODM\PHPCR\Query\Builder\ConstraintComparison;
 use Doctrine\ODM\PHPCR\Query\Builder\ConverterPhpcr;
 use Doctrine\ODM\PHPCR\Query\Builder\From;
 use Doctrine\ODM\PHPCR\Query\Builder\OperandFactory;
-use Doctrine\ODM\PHPCR\Query\Builder\Ordering;
 use Doctrine\ODM\PHPCR\Query\Builder\QueryBuilder;
 use Doctrine\ODM\PHPCR\Query\Builder\SourceDocument;
 use ReflectionMethod;
@@ -107,7 +107,7 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
 
             $direction = $mainOrder[1] === Orderings::SORT_ASC ? 'gte' : 'lte';
             $ordering = $queryBuilder->andWhere()->{$direction}();
-            assert($ordering instanceof Ordering);
+            assert($ordering instanceof ConstraintComparison);
 
             if ($classMetadata->getTypeOfField($mainOrder[0]) === 'nodename') {
                 $factory = $ordering->localName($alias);
