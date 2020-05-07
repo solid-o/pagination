@@ -25,7 +25,9 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
     use IteratorTrait;
 
     /**
-     * @param Orderings|array<string>|array<string, string>|array<array<string>> $orderBy
+     * @param Orderings|string[]|string[][] $orderBy
+     *
+     * @phpstan-param Orderings|array<string>|array<string, 'asc'|'desc'>|array<array{string, 'asc'|'desc'}> $orderBy
      */
     public function __construct(QueryBuilder $queryBuilder, $orderBy)
     {
