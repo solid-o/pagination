@@ -84,7 +84,7 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
 
             $direction = $mainOrder[1] === Orderings::SORT_ASC ? '>=' : '<=';
             $queryBuilder->andWhere($alias . '.' . $mainOrder[0] . ' ' . $direction . ' :timeLimit');
-            $queryBuilder->setParameter('timeLimit', $timestamp);
+            $queryBuilder->setParameter('timeLimit', $timestamp, $type !== null ? $type->getName() : null);
         }
 
         $queryBuilder->setMaxResults($limit);

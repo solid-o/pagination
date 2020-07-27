@@ -199,10 +199,10 @@ class PagerIterator implements Iterator
     {
         $order = $this->orderBy[0];
 
-        return array_filter($objects, function ($entity) use ($order) {
-            assert($this->token !== null);
+        assert($this->token !== null);
+        $referenceTimestamp = $this->token->getOrderValue();
 
-            $referenceTimestamp = $this->token->getOrderValue();
+        return array_filter($objects, static function ($entity) use ($order, $referenceTimestamp) {
             $value = static::getAccessor()->getValue($entity, $order[0]);
 
             return $order[1] === Orderings::SORT_ASC ? $value >= $referenceTimestamp : $value <= $referenceTimestamp;
