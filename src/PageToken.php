@@ -7,6 +7,7 @@ namespace Solido\Pagination;
 use Solido\Pagination\Exception\InvalidArgumentException;
 use Solido\Pagination\Exception\InvalidTokenException;
 use Symfony\Component\HttpFoundation\Request;
+
 use function base64_encode;
 use function base_convert;
 use function count;

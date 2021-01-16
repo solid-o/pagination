@@ -11,6 +11,7 @@ use Refugis\DoctrineExtra\DBAL\IteratorTrait;
 use Refugis\DoctrineExtra\ObjectIteratorInterface;
 use Solido\Pagination\Orderings;
 use Solido\Pagination\PagerIterator as BaseIterator;
+
 use function assert;
 use function call_user_func;
 use function is_callable;
@@ -18,6 +19,7 @@ use function is_object;
 use function json_decode;
 use function json_encode;
 use function strtoupper;
+
 use const JSON_THROW_ON_ERROR;
 
 final class PagerIterator extends BaseIterator implements ObjectIteratorInterface

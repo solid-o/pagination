@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Solido\Pagination\Elastica;
 
+use DateTimeImmutable;
 use Elastica\Query;
 use Refugis\DoctrineExtra\IteratorTrait;
 use Refugis\DoctrineExtra\ObjectIteratorInterface;
 use Refugis\ODM\Elastica\Search\Search;
 use Refugis\ODM\Elastica\Type\AbstractDateTimeType;
-use Safe\DateTimeImmutable;
 use Solido\Pagination\Orderings;
 use Solido\Pagination\PagerIterator as BaseIterator;
 
@@ -91,7 +91,9 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
 
             if ($type instanceof AbstractDateTimeType) {
                 $datetime = DateTimeImmutable::createFromFormat('U', (string) $timestamp);
-                $timestamp = $datetime->format('Y-m-d\TH:i:sO');
+                if ($datetime !== false) {
+                    $timestamp = $datetime->format('Y-m-d\TH:i:sO');
+                }
             }
 
             $direction = $mainOrder[1] === Orderings::SORT_ASC ? 'gte' : 'lte';

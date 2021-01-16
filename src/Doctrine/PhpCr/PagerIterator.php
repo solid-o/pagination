@@ -19,6 +19,7 @@ use Refugis\DoctrineExtra\ObjectIteratorInterface;
 use Refugis\DoctrineExtra\ODM\PhpCr\IteratorTrait;
 use Solido\Pagination\Orderings;
 use Solido\Pagination\PagerIterator as BaseIterator;
+
 use function array_values;
 use function assert;
 use function is_array;

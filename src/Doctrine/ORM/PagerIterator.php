@@ -13,6 +13,7 @@ use Refugis\DoctrineExtra\ObjectIteratorInterface;
 use Refugis\DoctrineExtra\ORM\IteratorTrait;
 use Solido\Pagination\Orderings;
 use Solido\Pagination\PagerIterator as BaseIterator;
+
 use function is_string;
 use function strtoupper;
 

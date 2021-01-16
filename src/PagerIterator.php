@@ -13,6 +13,7 @@ use Solido\Pagination\Accessor\ValueAccessor;
 use Solido\Pagination\Accessor\ValueAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Traversable;
+
 use function array_filter;
 use function array_pop;
 use function array_reverse;
