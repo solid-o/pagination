@@ -36,7 +36,7 @@ class PagerIteratorTest extends TestCase
     {
         $this->documentManager = null;
         $class = new DocumentMetadata(new \ReflectionClass(TestObject::class));
-        $class->collectionName = 'test-object/test-object';
+        $class->collectionName = 'test-object';
 
         $id = new FieldMetadata($class, 'id');
         $id->identifier = true;
@@ -127,7 +127,7 @@ class PagerIteratorTest extends TestCase
             ],
         ], 200);
 
-        $this->client->request('test-object/test-object/_search', 'GET', $expectedQuery, [])
+        $this->client->request('test-object/_search', 'GET', $expectedQuery, [])
             ->willReturn($response)
         ;
 
@@ -222,7 +222,7 @@ class PagerIteratorTest extends TestCase
             ],
         ], 200);
 
-        $this->client->request('test-object/test-object/_search', 'GET', $expectedQuery, [])
+        $this->client->request('test-object/_search', 'GET', $expectedQuery, [])
             ->willReturn($response)
         ;
 
@@ -300,7 +300,7 @@ class PagerIteratorTest extends TestCase
             ],
         ], 200);
 
-        $this->client->request('test-object/test-object/_search', 'GET', $expectedQuery, [])
+        $this->client->request('test-object/_search', 'GET', $expectedQuery, [])
             ->willReturn($response)
         ;
 
@@ -406,7 +406,7 @@ class PagerIteratorTest extends TestCase
             ],
         ], 200);
 
-        $this->client->request('test-object/test-object/_search', 'GET', $expectedQuery, [])
+        $this->client->request('test-object/_search', 'GET', $expectedQuery, [])
             ->willReturn($response)
         ;
 
@@ -494,7 +494,7 @@ class PagerIteratorTest extends TestCase
             ],
         ], 200);
 
-        $this->client->request('test-object/test-object/_search', 'GET', $expectedQuery, [])
+        $this->client->request('test-object/_search', 'GET', $expectedQuery, [])
             ->willReturn($response)
         ;
 
@@ -589,7 +589,7 @@ class PagerIteratorTest extends TestCase
             ],
         ], 200);
 
-        $this->client->request('test-object/test-object/_search', 'GET', $expectedQuery, [])
+        $this->client->request('test-object/_search', 'GET', $expectedQuery, [])
             ->willReturn($response)
         ;
 
