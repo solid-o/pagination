@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Solido\Pagination\Tests\Elastica;
 
@@ -6,18 +8,20 @@ use Cake\Chronos\Chronos;
 use Elastica\Query;
 use Elastica\Response;
 use Elastica\Type;
-use Prophecy\Argument;
-use Solido\Pagination\Elastica\PagerIterator;
-use Solido\Pagination\PageToken;
-use Solido\Pagination\Tests\TestObject;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use Refugis\ODM\Elastica\Collection\CollectionInterface;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use Refugis\ODM\Elastica\Metadata\FieldMetadata;
 use Refugis\ODM\Elastica\Search\Search;
-use PHPUnit\Framework\TestCase;
+use Solido\Pagination\Elastica\PagerIterator;
+use Solido\Pagination\PageToken;
+use Solido\Pagination\Tests\TestObject;
 use Solido\TestUtils\Elastica\DocumentManagerTrait;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
+
+use function iterator_to_array;
 
 class PagerIteratorTest extends TestCase
 {
@@ -29,13 +33,10 @@ class PagerIteratorTest extends TestCase
     private Type $type;
     private Query $query;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->documentManager = null;
-        $class = new DocumentMetadata(new \ReflectionClass(TestObject::class));
+        $class = new DocumentMetadata(new ReflectionClass(TestObject::class));
         $class->collectionName = 'test-object';
 
         $id = new FieldMetadata($class, 'id');
@@ -59,8 +60,7 @@ class PagerIteratorTest extends TestCase
         $this->query = new Query();
         $this->query
             ->setSort(['timestamp', 'id'])
-            ->setSize(3)
-        ;
+            ->setSize(3);
 
         $this->search = $this->collection->createSearch($documentManager, $this->query);
         $this->iterator = new PagerIterator($this->search, ['timestamp', 'id']);
@@ -128,8 +128,7 @@ class PagerIteratorTest extends TestCase
         ], 200);
 
         $this->client->request('test-object/_search', 'GET', $expectedQuery, [])
-            ->willReturn($response)
-        ;
+            ->willReturn($response);
 
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag([]);
@@ -140,7 +139,7 @@ class PagerIteratorTest extends TestCase
             new TestObject('b4902bde-28d2-4ff9-8971-8bfeb3e943c1', new Chronos('1991-11-24 00:00:00')),
             new TestObject('191a54d8-990c-4ea7-9a23-0aed29d1fffe', new Chronos('1991-11-24 01:00:00')),
             new TestObject('9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', new Chronos('1991-11-24 02:00:00')),
-        ], \iterator_to_array($this->iterator));
+        ], iterator_to_array($this->iterator));
 
         self::assertEquals('bfdew0_1_1jvdwz4', (string) $this->iterator->getNextPageToken());
     }
@@ -150,13 +149,13 @@ class PagerIteratorTest extends TestCase
         $expectedQuery = [
             'query' => [
                 'bool' => [
-                    'filter' => [[
-                        'range' => [
-                            'timestamp' => [
-                                'gte' => '1991-11-24T02:00:00+0000',
+                    'filter' => [
+                        [
+                            'range' => [
+                                'timestamp' => ['gte' => '1991-11-24T02:00:00+0000'],
                             ],
                         ],
-                    ]],
+                    ],
                 ],
             ],
             '_source' => [
@@ -223,8 +222,7 @@ class PagerIteratorTest extends TestCase
         ], 200);
 
         $this->client->request('test-object/_search', 'GET', $expectedQuery, [])
-            ->willReturn($response)
-        ;
+            ->willReturn($response);
 
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag(['continue' => 'bfdew0_1_1jvdwz4']);
@@ -235,7 +233,7 @@ class PagerIteratorTest extends TestCase
             new TestObject('af6394a4-7344-4fe8-9748-e6c67eba5ade', new Chronos('1991-11-24 03:00:00')),
             new TestObject('84810e2e-448f-4f58-acb8-4db1381f5de3', new Chronos('1991-11-24 04:00:00')),
             new TestObject('eadd7470-95f5-47e8-8e74-083d45c307f6', new Chronos('1991-11-24 05:00:00')),
-        ], \iterator_to_array($this->iterator));
+        ], iterator_to_array($this->iterator));
 
         self::assertEquals('bfdn80_1_cukvcs', (string) $this->iterator->getNextPageToken());
     }
@@ -301,8 +299,7 @@ class PagerIteratorTest extends TestCase
         ], 200);
 
         $this->client->request('test-object/_search', 'GET', $expectedQuery, [])
-            ->willReturn($response)
-        ;
+            ->willReturn($response);
 
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag([]);
@@ -313,7 +310,7 @@ class PagerIteratorTest extends TestCase
             new TestObject('b4902bde-28d2-4ff9-8971-8bfeb3e943c1', new Chronos('1991-11-24 00:00:00')),
             new TestObject('191a54d8-990c-4ea7-9a23-0aed29d1fffe', new Chronos('1991-11-24 01:00:00')),
             new TestObject('84810e2e-448f-4f58-acb8-4db1381f5de3', new Chronos('1991-11-24 01:00:00')),
-        ], \iterator_to_array($this->iterator));
+        ], iterator_to_array($this->iterator));
 
         self::assertEquals(2, $this->iterator->getNextPageToken()->getOffset());
 
@@ -325,13 +322,13 @@ class PagerIteratorTest extends TestCase
         $expectedQuery = [
             'query' => [
                 'bool' => [
-                    'filter' => [[
-                        'range' => [
-                            'timestamp' => [
-                                'gte' => '1991-11-24T01:00:00+0000',
+                    'filter' => [
+                        [
+                            'range' => [
+                                'timestamp' => ['gte' => '1991-11-24T01:00:00+0000'],
                             ],
                         ],
-                    ]],
+                    ],
                 ],
             ],
             '_source' => [
@@ -407,14 +404,13 @@ class PagerIteratorTest extends TestCase
         ], 200);
 
         $this->client->request('test-object/_search', 'GET', $expectedQuery, [])
-            ->willReturn($response)
-        ;
+            ->willReturn($response);
 
         self::assertEquals([
             new TestObject('9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', new Chronos('1991-11-24 01:00:00')),
             new TestObject('af6394a4-7344-4fe8-9748-e6c67eba5ade', new Chronos('1991-11-24 01:00:00')),
             new TestObject('eadd7470-95f5-47e8-8e74-083d45c307f6', new Chronos('1991-11-24 02:00:00')),
-        ], \iterator_to_array($this->iterator));
+        ], iterator_to_array($this->iterator));
     }
 
     public function testPagerShouldReturnFirstPageWithTimestampDifference(): void
@@ -422,13 +418,13 @@ class PagerIteratorTest extends TestCase
         $expectedQuery = [
             'query' => [
                 'bool' => [
-                    'filter' => [[
-                        'range' => [
-                            'timestamp' => [
-                                'gte' => '1991-11-24T02:00:00+0000',
+                    'filter' => [
+                        [
+                            'range' => [
+                                'timestamp' => ['gte' => '1991-11-24T02:00:00+0000'],
                             ],
                         ],
-                    ]],
+                    ],
                 ],
             ],
             '_source' => [
@@ -495,8 +491,7 @@ class PagerIteratorTest extends TestCase
         ], 200);
 
         $this->client->request('test-object/_search', 'GET', $expectedQuery, [])
-            ->willReturn($response)
-        ;
+            ->willReturn($response);
 
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag(['continue' => 'bfdew0_1_1jvdwz4']); // This token represents a request with the 02:00:00 timestamp
@@ -507,7 +502,7 @@ class PagerIteratorTest extends TestCase
             new TestObject('9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', new Chronos('1991-11-24 02:30:00')),
             new TestObject('af6394a4-7344-4fe8-9748-e6c67eba5ade', new Chronos('1991-11-24 03:00:00')),
             new TestObject('84810e2e-448f-4f58-acb8-4db1381f5de3', new Chronos('1991-11-24 04:00:00')),
-        ], \iterator_to_array($this->iterator));
+        ], iterator_to_array($this->iterator));
 
         self::assertEquals('bfdkg0_1_1xirtcr', (string) $this->iterator->getNextPageToken());
     }
@@ -517,13 +512,13 @@ class PagerIteratorTest extends TestCase
         $expectedQuery = [
             'query' => [
                 'bool' => [
-                    'filter' => [[
-                        'range' => [
-                            'timestamp' => [
-                                'gte' => '1991-11-24T02:00:00+0000',
+                    'filter' => [
+                        [
+                            'range' => [
+                                'timestamp' => ['gte' => '1991-11-24T02:00:00+0000'],
                             ],
                         ],
-                    ]],
+                    ],
                 ],
             ],
             '_source' => [
@@ -590,8 +585,7 @@ class PagerIteratorTest extends TestCase
         ], 200);
 
         $this->client->request('test-object/_search', 'GET', $expectedQuery, [])
-            ->willReturn($response)
-        ;
+            ->willReturn($response);
 
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag(['continue' => 'bfdew0_1_1jvdwz4']); // This token represents a request with the 02:00:00 timestamp
@@ -602,7 +596,7 @@ class PagerIteratorTest extends TestCase
             new TestObject('af6394a4-7344-4fe8-9748-e6c67eba5ade', new Chronos('1991-11-24 02:00:00')),
             new TestObject('9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', new Chronos('1991-11-24 03:00:00')),
             new TestObject('191a54d8-990c-4ea7-9a23-0aed29d1fffe', new Chronos('1991-11-24 04:00:00')),
-        ], \iterator_to_array($this->iterator));
+        ], iterator_to_array($this->iterator));
 
         self::assertEquals('bfdkg0_1_7gqxdp', (string) $this->iterator->getNextPageToken());
     }

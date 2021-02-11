@@ -1,17 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Solido\Pagination\Tests;
 
 class TestObject
 {
-    /**
-     * @var mixed
-     */
+    /** @var mixed */
     public $id;
 
-    /**
-     * @var mixed
-     */
+    /** @var mixed */
     public $timestamp;
 
     public function __construct($id, $timestamp)
