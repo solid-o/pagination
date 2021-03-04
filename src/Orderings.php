@@ -59,7 +59,7 @@ final class Orderings implements Countable, IteratorAggregate, ArrayAccess
     /**
      * Whether a offset exists
      *
-     * @param string $offset
+     * @param string|int $offset
      */
     public function offsetExists($offset): bool
     {
@@ -69,7 +69,7 @@ final class Orderings implements Countable, IteratorAggregate, ArrayAccess
     /**
      * Offset to retrieve
      *
-     * @param int $offset
+     * @param string|int $offset
      *
      * @return array<string>
      */
