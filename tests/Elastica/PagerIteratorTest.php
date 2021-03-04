@@ -7,8 +7,8 @@ namespace Solido\Pagination\Tests\Elastica;
 use Cake\Chronos\Chronos;
 use Elastica\Query;
 use Elastica\Response;
-use Elastica\Type;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use ReflectionClass;
 use Refugis\ODM\Elastica\Collection\CollectionInterface;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
@@ -28,10 +28,6 @@ class PagerIteratorTest extends TestCase
     use DocumentManagerTrait;
 
     private PagerIterator $iterator;
-    private CollectionInterface $collection;
-    private Search $search;
-    private Type $type;
-    private Query $query;
 
     protected function setUp(): void
     {
@@ -55,15 +51,15 @@ class PagerIteratorTest extends TestCase
         $documentManager = $this->getDocumentManager();
         $documentManager->getMetadataFactory()->setMetadataFor(TestObject::class, $class);
 
-        $this->collection = $documentManager->getCollection(TestObject::class);
+        $collection = $documentManager->getCollection(TestObject::class);
 
-        $this->query = new Query();
-        $this->query
+        $query = new Query();
+        $query
             ->setSort(['timestamp', 'id'])
             ->setSize(3);
 
-        $this->search = $this->collection->createSearch($documentManager, $this->query);
-        $this->iterator = new PagerIterator($this->search, ['timestamp', 'id']);
+        $search = $collection->createSearch($documentManager, $query);
+        $this->iterator = new PagerIterator($search, ['timestamp', 'id']);
         $this->iterator->setPageSize(3);
     }
 
@@ -127,7 +123,7 @@ class PagerIteratorTest extends TestCase
             ],
         ], 200);
 
-        $this->client->request('test-object/_search', 'GET', $expectedQuery, [])
+        $this->client->request('test-object/_search', 'POST', $expectedQuery, [])
             ->willReturn($response);
 
         $request = $this->prophesize(Request::class);
@@ -221,7 +217,7 @@ class PagerIteratorTest extends TestCase
             ],
         ], 200);
 
-        $this->client->request('test-object/_search', 'GET', $expectedQuery, [])
+        $this->client->request('test-object/_search', 'POST', $expectedQuery, [])
             ->willReturn($response);
 
         $request = $this->prophesize(Request::class);
@@ -298,7 +294,7 @@ class PagerIteratorTest extends TestCase
             ],
         ], 200);
 
-        $this->client->request('test-object/_search', 'GET', $expectedQuery, [])
+        $this->client->request('test-object/_search', 'POST', $expectedQuery, [])
             ->willReturn($response);
 
         $request = $this->prophesize(Request::class);
@@ -403,7 +399,7 @@ class PagerIteratorTest extends TestCase
             ],
         ], 200);
 
-        $this->client->request('test-object/_search', 'GET', $expectedQuery, [])
+        $this->client->request('test-object/_search', 'POST', $expectedQuery, [])
             ->willReturn($response);
 
         self::assertEquals([
@@ -490,7 +486,7 @@ class PagerIteratorTest extends TestCase
             ],
         ], 200);
 
-        $this->client->request('test-object/_search', 'GET', $expectedQuery, [])
+        $this->client->request('test-object/_search', 'POST', $expectedQuery, [])
             ->willReturn($response);
 
         $request = $this->prophesize(Request::class);
@@ -584,7 +580,7 @@ class PagerIteratorTest extends TestCase
             ],
         ], 200);
 
-        $this->client->request('test-object/_search', 'GET', $expectedQuery, [])
+        $this->client->request('test-object/_search', 'POST', $expectedQuery, [])
             ->willReturn($response);
 
         $request = $this->prophesize(Request::class);
