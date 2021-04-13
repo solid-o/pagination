@@ -12,9 +12,13 @@ class TestObject
     /** @var mixed */
     public $timestamp;
 
-    public function __construct($id, $timestamp)
+    /** @var RelatedTestObject */
+    public $related;
+
+    public function __construct($id, $timestamp, $related = null)
     {
         $this->id = $id;
         $this->timestamp = $timestamp;
+        $this->related = $related;
     }
 }
