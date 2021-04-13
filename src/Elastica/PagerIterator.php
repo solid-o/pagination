@@ -13,6 +13,8 @@ use Refugis\ODM\Elastica\Type\AbstractDateTimeType;
 use Solido\Pagination\Orderings;
 use Solido\Pagination\PagerIterator as BaseIterator;
 
+use function assert;
+
 final class PagerIterator extends BaseIterator implements ObjectIteratorInterface
 {
     use IteratorTrait;
@@ -75,7 +77,10 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
         $query = new Query\BoolQuery();
         $searchQuery = $search->getQuery();
         if ($searchQuery->hasParam('query')) {
-            $query->addFilter($searchQuery->getQuery());
+            $filter = $searchQuery->getQuery();
+            assert($filter instanceof Query\AbstractQuery);
+
+            $query->addFilter($filter);
         }
 
         $limit = $this->pageSize;

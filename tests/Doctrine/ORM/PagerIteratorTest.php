@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use PDO;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use ReflectionProperty;
 use Solido\Pagination\Doctrine\ORM\PagerIterator;
 use Solido\Pagination\PageToken;
@@ -99,7 +100,7 @@ class PagerIteratorTest extends TestCase
         $stmt->execute()->willReturn(true);
         $stmt->closeCursor()->willReturn(true);
 
-        $stmt->fetch(PDO::FETCH_ASSOC)
+        $stmt->fetch(PDO::FETCH_ASSOC, Argument::cetera())
             ->willReturn(
                 ['id_0' => '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', 'timestamp_1' => '1991-11-24 02:00:00'],
                 ['id_0' => 'af6394a4-7344-4fe8-9748-e6c67eba5ade', 'timestamp_1' => '1991-11-24 03:00:00'],
@@ -157,7 +158,7 @@ class PagerIteratorTest extends TestCase
         $stmt->execute()->willReturn(true);
         $stmt->closeCursor()->willReturn(true);
 
-        $stmt->fetch(PDO::FETCH_ASSOC)
+        $stmt->fetch(PDO::FETCH_ASSOC, Argument::cetera())
             ->willReturn(
                 ['id_0' => '191a54d8-990c-4ea7-9a23-0aed29d1fffe', 'timestamp_1' => '1991-11-24 01:00:00'],
                 ['id_0' => '84810e2e-448f-4f58-acb8-4db1381f5de3', 'timestamp_1' => '1991-11-24 01:00:00'],
@@ -184,7 +185,7 @@ class PagerIteratorTest extends TestCase
         $stmt->execute()->willReturn(true);
         $stmt->closeCursor()->willReturn(true);
 
-        $stmt->fetch(PDO::FETCH_ASSOC)
+        $stmt->fetch(PDO::FETCH_ASSOC, Argument::cetera())
             ->willReturn(
                 ['id_0' => '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', 'timestamp_1' => '1991-11-24 02:30:00'],
                 ['id_0' => 'af6394a4-7344-4fe8-9748-e6c67eba5ade', 'timestamp_1' => '1991-11-24 03:00:00'],
@@ -217,7 +218,7 @@ class PagerIteratorTest extends TestCase
         $stmt->execute()->willReturn(true);
         $stmt->closeCursor()->willReturn(true);
 
-        $stmt->fetch(PDO::FETCH_ASSOC)
+        $stmt->fetch(PDO::FETCH_ASSOC, Argument::cetera())
             ->willReturn(
                 ['id_0' => 'af6394a4-7344-4fe8-9748-e6c67eba5ade', 'timestamp_1' => '1991-11-24 02:00:00'],
                 ['id_0' => '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', 'timestamp_1' => '1991-11-24 03:00:00'],

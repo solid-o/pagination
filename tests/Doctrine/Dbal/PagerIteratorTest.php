@@ -10,6 +10,7 @@ use Doctrine\DBAL\FetchMode;
 use Doctrine\DBAL\Query\QueryBuilder;
 use PDO;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Solido\Pagination\Doctrine\DBAL\PagerIterator;
 use Solido\Pagination\PageToken;
 use Solido\TestUtils\Doctrine\ORM\EntityManagerTrait;
@@ -76,7 +77,7 @@ class PagerIteratorTest extends TestCase
         $stmt->execute()->willReturn(true);
         $stmt->closeCursor()->willReturn(true);
 
-        $stmt->fetchAll(PDO::FETCH_OBJ)
+        $stmt->fetchAll(PDO::FETCH_OBJ, Argument::cetera())
             ->willReturn([
                 (object) ['id' => '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', 'timestamp' => '1991-11-24 02:00:00'],
                 (object) ['id' => 'af6394a4-7344-4fe8-9748-e6c67eba5ade', 'timestamp' => '1991-11-24 03:00:00'],
@@ -133,7 +134,7 @@ class PagerIteratorTest extends TestCase
         $stmt->execute()->willReturn(true);
         $stmt->closeCursor()->willReturn(true);
 
-        $stmt->fetchAll(PDO::FETCH_OBJ)
+        $stmt->fetchAll(PDO::FETCH_OBJ, Argument::cetera())
             ->willReturn([
                 (object) ['id' => '191a54d8-990c-4ea7-9a23-0aed29d1fffe', 'timestamp' => '1991-11-24 01:00:00'],
                 (object) ['id' => '84810e2e-448f-4f58-acb8-4db1381f5de3', 'timestamp' => '1991-11-24 01:00:00'],
@@ -159,7 +160,7 @@ class PagerIteratorTest extends TestCase
         $stmt->execute()->willReturn(true);
         $stmt->closeCursor()->willReturn(true);
 
-        $stmt->fetchAll(PDO::FETCH_OBJ)
+        $stmt->fetchAll(PDO::FETCH_OBJ, Argument::cetera())
             ->willReturn([
                 (object) ['id' => '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', 'timestamp' => '1991-11-24 02:30:00'],
                 (object) ['id' => 'af6394a4-7344-4fe8-9748-e6c67eba5ade', 'timestamp' => '1991-11-24 03:00:00'],
@@ -191,7 +192,7 @@ class PagerIteratorTest extends TestCase
         $stmt->execute()->willReturn(true);
         $stmt->closeCursor()->willReturn(true);
 
-        $stmt->fetchAll(PDO::FETCH_OBJ)
+        $stmt->fetchAll(PDO::FETCH_OBJ, Argument::cetera())
             ->willReturn([
                 (object) ['id' => 'af6394a4-7344-4fe8-9748-e6c67eba5ade', 'timestamp' => '1991-11-24 02:00:00'],
                 (object) ['id' => '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', 'timestamp' => '1991-11-24 03:00:00'],
