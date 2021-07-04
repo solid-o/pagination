@@ -35,7 +35,6 @@ final class Orderings implements Countable, IteratorAggregate, ArrayAccess
      * - array containing field name and the direction.
      *
      * @param string[]|string[][] $orderings
-     *
      * @phpstan-param array<string>|array<string, 'asc'|'desc'>|array<array{string, 'asc'|'desc'}> $orderings
      */
     public function __construct(array $orderings)
@@ -103,10 +102,9 @@ final class Orderings implements Countable, IteratorAggregate, ArrayAccess
      * Normalizes the orderings array.
      *
      * @param string[]|string[][] $orderings
+     * @phpstan-param array<string>|array<string, 'asc'|'desc'>|array<array{string, 'asc'|'desc'}> $orderings
      *
      * @return array<array<string>>
-     *
-     * @phpstan-param array<string>|array<string, 'asc'|'desc'>|array<array{string, 'asc'|'desc'}> $orderings
      */
     private static function normalize(array $orderings): array
     {

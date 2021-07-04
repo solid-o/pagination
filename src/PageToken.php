@@ -145,11 +145,11 @@ final class PageToken
     public static function fromRequest(Request $request): ?self
     {
         $token = $request->query->get('continue');
-        if (empty($token) || ! self::isValid($token)) {
+        if (empty($token) || ! self::isValid((string) $token)) {
             return null;
         }
 
-        return self::parse($token);
+        return self::parse((string) $token);
     }
 
     /**

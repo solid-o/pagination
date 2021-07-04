@@ -23,6 +23,7 @@ use Solido\Pagination\PagerIterator as BaseIterator;
 use function array_values;
 use function assert;
 use function is_array;
+use function is_string;
 use function iterator_to_array;
 
 final class PagerIterator extends BaseIterator implements ObjectIteratorInterface
@@ -31,7 +32,6 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
 
     /**
      * @param Orderings|string[]|string[][] $orderBy
-     *
      * @phpstan-param Orderings|array<string>|array<string, 'asc'|'desc'>|array<array{string, 'asc'|'desc'}> $orderBy
      */
     public function __construct(QueryBuilder $searchable, $orderBy)
@@ -82,8 +82,14 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
             return $this->dm;
         })->bindTo($converter, ConverterPhpcr::class)();
 
+        /**
+         * @phpstan-var class-string $documentFqn
+         */
+        $documentFqn = $source->getDocumentFqn();
+        assert(is_string($documentFqn));
+
         assert($documentManager instanceof DocumentManagerInterface);
-        $classMetadata = $documentManager->getClassMetadata($source->getDocumentFqn());
+        $classMetadata = $documentManager->getClassMetadata($documentFqn);
 
         foreach ($this->orderBy as $key => [$field, $direction]) {
             $method = $key === 0 ? 'orderBy' : 'addOrderBy';
@@ -101,7 +107,13 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
             $limit += $this->token->getOffset();
             $mainOrder = $this->orderBy[0];
 
-            $type = $documentManager->getClassMetadata($source->getDocumentFqn())->getTypeOfField($mainOrder[0]);
+            /**
+             * @phpstan-var class-string $sourceFqn
+             */
+            $sourceFqn = $source->getDocumentFqn();
+            assert(is_string($sourceFqn));
+
+            $type = $documentManager->getClassMetadata($sourceFqn)->getTypeOfField($mainOrder[0]);
             if ($type === 'date') {
                 $timestamp = DateTimeImmutable::createFromFormat('U', (string) $timestamp);
             }

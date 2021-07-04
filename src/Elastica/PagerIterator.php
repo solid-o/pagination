@@ -14,6 +14,7 @@ use Solido\Pagination\Orderings;
 use Solido\Pagination\PagerIterator as BaseIterator;
 
 use function assert;
+use function is_string;
 
 final class PagerIterator extends BaseIterator implements ObjectIteratorInterface
 {
@@ -24,7 +25,6 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
 
     /**
      * @param Orderings|string[]|string[][] $orderBy
-     *
      * @phpstan-param Orderings|array<string>|array<string, 'asc'|'desc'>|array<array{string, 'asc'|'desc'}> $orderBy
      */
     public function __construct(Search $search, $orderBy)
@@ -91,8 +91,14 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
 
             $documentManager = $this->search->getDocumentManager();
 
+            /**
+             * @phpstan-var class-string $documentClass
+             */
+            $documentClass = $this->search->getDocumentClass();
+            assert(is_string($documentClass));
+
             $type = $documentManager->getTypeManager()
-                ->getType($documentManager->getClassMetadata($this->search->getDocumentClass())->getTypeOfField($mainOrder[0]));
+                ->getType($documentManager->getClassMetadata($documentClass)->getTypeOfField($mainOrder[0]));
 
             if ($type instanceof AbstractDateTimeType) {
                 $datetime = DateTimeImmutable::createFromFormat('U', (string) $timestamp);
