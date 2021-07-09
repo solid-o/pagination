@@ -20,6 +20,7 @@
     },
     "require": {
         "php": "^7.4 || ^8.0",
+        "solido/common": "dev-master",
         "symfony/property-access": "^4.4 || ^5.0"
     },
     "require-dev": {
@@ -30,6 +31,7 @@
         "doctrine/phpcr-odm": "^1.5",
         "jackalope/jackalope-doctrine-dbal": "^1.4",
         "phpunit/phpunit": "^9.4",
+        "psr/http-message": "^1.0",
         "refugis/doctrine-extra": "^2.1.0",
         "refugis/elastica-odm": "2.x-dev",
         "roave/security-advisories": "dev-master",
@@ -56,7 +58,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "0.1.x-dev"
+            "dev-master": "0.2.x-dev"
         }
     }
 }

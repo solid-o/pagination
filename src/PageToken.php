@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Solido\Pagination;
 
+use Solido\Common\AdapterFactory;
+use Solido\Common\RequestAdapter\RequestAdapterInterface;
 use Solido\Pagination\Exception\InvalidArgumentException;
 use Solido\Pagination\Exception\InvalidTokenException;
-use Symfony\Component\HttpFoundation\Request;
 
 use function base64_encode;
 use function base_convert;
@@ -142,9 +143,14 @@ final class PageToken
     /**
      * Extract the token from the request and parses it.
      */
-    public static function fromRequest(Request $request): ?self
+    public static function fromRequest(object $request): ?self
     {
-        $token = $request->query->get('continue');
+        if (! $request instanceof RequestAdapterInterface) {
+            $adapterFactory = new AdapterFactory();
+            $request = $adapterFactory->createRequestAdapter($request);
+        }
+
+        $token = $request->hasQueryParam('continue') ? $request->getQueryParam('continue') : null;
         if (empty($token) || ! self::isValid((string) $token)) {
             return null;
         }
