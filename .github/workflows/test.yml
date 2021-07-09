@@ -1,5 +1,8 @@
 name: Tests
-on: [push, pull_request]
+on:
+    push:
+    pull_request:
+        types: [opened]
 
 jobs:
     build:
@@ -13,11 +16,15 @@ jobs:
         name: PHP ${{ matrix.php_version }}
         steps:
             - uses: actions/checkout@v2
+              with:
+                fetch-depth: 0
+
             - name: Setup PHP with pecl extension
               uses: shivammathur/setup-php@v2
               with:
                   php-version: ${{ matrix.php_version }}
                   extensions: :opcache
+
             - run: composer install
             - run: vendor/bin/phpunit --coverage-clover phpunit/phpunit.coverage.xml --log-junit phpunit/junit.xml
 
