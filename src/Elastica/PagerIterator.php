@@ -10,11 +10,13 @@ use Refugis\DoctrineExtra\IteratorTrait;
 use Refugis\DoctrineExtra\ObjectIteratorInterface;
 use Refugis\ODM\Elastica\Search\Search;
 use Refugis\ODM\Elastica\Type\AbstractDateTimeType;
+use Solido\Pagination\Exception\InvalidArgumentException;
 use Solido\Pagination\Orderings;
 use Solido\Pagination\PagerIterator as BaseIterator;
 
 use function assert;
 use function is_string;
+use function Safe\sprintf;
 
 final class PagerIterator extends BaseIterator implements ObjectIteratorInterface
 {
@@ -70,7 +72,10 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
         $search = clone $this->search;
 
         $sort = [];
+
         foreach ($this->orderBy as [$field, $direction]) {
+            assert(is_string($field));
+            assert(is_string($direction));
             $sort[$field] = $direction;
         }
 
@@ -97,9 +102,12 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
             $documentClass = $this->search->getDocumentClass();
             assert(is_string($documentClass));
 
-            $type = $documentManager->getTypeManager()
-                ->getType($documentManager->getClassMetadata($documentClass)->getTypeOfField($mainOrder[0]));
+            $typeName = $documentManager->getClassMetadata($documentClass)->getTypeOfField($mainOrder[0]);
+            if ($typeName === null) {
+                throw new InvalidArgumentException(sprintf('Field %s does not exist or is not a valid field', $mainOrder[0]));
+            }
 
+            $type = $documentManager->getTypeManager()->getType($typeName);
             if ($type instanceof AbstractDateTimeType) {
                 $datetime = DateTimeImmutable::createFromFormat('U', (string) $timestamp);
                 if ($datetime !== false) {

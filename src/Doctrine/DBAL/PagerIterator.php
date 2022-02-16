@@ -115,7 +115,7 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
             $stmt = $queryBuilder->execute();
             assert($stmt instanceof ResultStatement);
 
-            return $stmt->fetchAll(FetchMode::STANDARD_OBJECT);
+            return $stmt->fetchAll(FetchMode::STANDARD_OBJECT); /* @phpstan-ignore-line */
         }
 
         $result = $queryBuilder->executeQuery();
