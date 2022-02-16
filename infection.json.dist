@@ -1,0 +1,31 @@
+{
+    "source": {
+        "directories": [
+            "src"
+        ]
+    },
+    "logs": {
+        "html": "infection\/infection.html",
+        "text": "infection\/infection.log"
+    },
+    "mutators": {
+        "global-ignoreSourceCodeByRegex": [
+            "assert.*"
+        ],
+        "@default": true,
+        "DecrementInteger": {
+            "ignoreSourceCodeByRegex": [
+                ".*json_decode.*",
+                ".*throw new.*"
+            ]
+        },
+        "IncrementInteger": {
+            "ignoreSourceCodeByRegex": [
+                ".*json_decode.*",
+                ".*throw new.*"
+            ]
+        }
+    },
+    "minMsi": 95,
+    "minCoveredMsi": 95
+}

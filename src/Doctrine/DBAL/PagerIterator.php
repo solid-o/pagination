@@ -7,13 +7,16 @@ namespace Solido\Pagination\Doctrine\DBAL;
 use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\FetchMode;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Types\Types;
 use Refugis\DoctrineExtra\DBAL\IteratorTrait;
 use Refugis\DoctrineExtra\ObjectIteratorInterface;
 use Solido\Pagination\Orderings;
 use Solido\Pagination\PagerIterator as BaseIterator;
 
+use function array_map;
 use function assert;
 use function call_user_func;
+use function class_exists;
 use function is_callable;
 use function is_object;
 use function json_decode;
@@ -104,14 +107,20 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
 
             $direction = $mainOrder[1] === Orderings::SORT_ASC ? '>=' : '<=';
             $queryBuilder->andWhere($mainOrder[0] . ' ' . $direction . ' :timeLimit');
-            $queryBuilder->setParameter('timeLimit', $timestamp);
+            $queryBuilder->setParameter('timeLimit', $timestamp, Types::TEXT);
         }
 
         $queryBuilder->setMaxResults($limit);
-        $stmt = $queryBuilder->execute();
-        assert($stmt instanceof ResultStatement);
+        if (class_exists(ResultStatement::class)) {
+            $stmt = $queryBuilder->execute();
+            assert($stmt instanceof ResultStatement);
 
-        return $stmt->fetchAll(FetchMode::STANDARD_OBJECT);
+            return $stmt->fetchAll(FetchMode::STANDARD_OBJECT);
+        }
+
+        $result = $queryBuilder->executeQuery();
+
+        return array_map(static fn (array $d): object => (object) $d, $result->fetchAllAssociative());
     }
 
     /**

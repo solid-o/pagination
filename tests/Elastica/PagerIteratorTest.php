@@ -8,12 +8,9 @@ use Cake\Chronos\Chronos;
 use Elastica\Query;
 use Elastica\Response;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
 use ReflectionClass;
-use Refugis\ODM\Elastica\Collection\CollectionInterface;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use Refugis\ODM\Elastica\Metadata\FieldMetadata;
-use Refugis\ODM\Elastica\Search\Search;
 use Solido\Pagination\Elastica\PagerIterator;
 use Solido\Pagination\PageToken;
 use Solido\Pagination\Tests\TestObject;
@@ -78,6 +75,7 @@ class PagerIteratorTest extends TestCase
                 ['id' => 'asc'],
             ],
             'size' => 3,
+            'seq_no_primary_term' => true,
         ];
 
         $response = new Response([
@@ -163,6 +161,7 @@ class PagerIteratorTest extends TestCase
                 ['id' => 'asc'],
             ],
             'size' => 4,
+            'seq_no_primary_term' => true,
         ];
 
         $response = new Response([
@@ -249,6 +248,7 @@ class PagerIteratorTest extends TestCase
                 ['id' => 'asc'],
             ],
             'size' => 3,
+            'seq_no_primary_term' => true,
         ];
 
         $response = new Response([
@@ -336,6 +336,7 @@ class PagerIteratorTest extends TestCase
                 ['id' => 'asc'],
             ],
             'size' => 5,
+            'seq_no_primary_term' => true,
         ];
 
         $response = new Response([
@@ -432,6 +433,7 @@ class PagerIteratorTest extends TestCase
                 ['id' => 'asc'],
             ],
             'size' => 4,
+            'seq_no_primary_term' => true,
         ];
 
         $response = new Response([
@@ -526,6 +528,7 @@ class PagerIteratorTest extends TestCase
                 ['id' => 'asc'],
             ],
             'size' => 4,
+            'seq_no_primary_term' => true,
         ];
 
         $response = new Response([
