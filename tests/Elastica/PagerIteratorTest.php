@@ -8,6 +8,7 @@ use Cake\Chronos\Chronos;
 use Elastica\Query;
 use Elastica\Response;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use ReflectionClass;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use Refugis\ODM\Elastica\Metadata\FieldMetadata;
@@ -67,7 +68,6 @@ class PagerIteratorTest extends TestCase
                 'bool' => (object) [],
             ],
             '_source' => [
-                'id',
                 'timestamp',
             ],
             'sort' => [
@@ -76,6 +76,7 @@ class PagerIteratorTest extends TestCase
             ],
             'size' => 3,
             'seq_no_primary_term' => true,
+            'version' => true,
         ];
 
         $response = new Response([
@@ -94,8 +95,8 @@ class PagerIteratorTest extends TestCase
                         '_index' => 'test-object',
                         '_type' => 'test-object',
                         '_score' => 1.0,
+                        '_id' => 'b4902bde-28d2-4ff9-8971-8bfeb3e943c1',
                         '_source' => [
-                            'id' => 'b4902bde-28d2-4ff9-8971-8bfeb3e943c1',
                             'timestamp' => '1991-11-24 00:00:00',
                         ],
                     ],
@@ -103,8 +104,8 @@ class PagerIteratorTest extends TestCase
                         '_index' => 'test-object',
                         '_type' => 'test-object',
                         '_score' => 1.0,
+                        '_id' => '191a54d8-990c-4ea7-9a23-0aed29d1fffe',
                         '_source' => [
-                            'id' => '191a54d8-990c-4ea7-9a23-0aed29d1fffe',
                             'timestamp' => '1991-11-24 01:00:00',
                         ],
                     ],
@@ -112,8 +113,8 @@ class PagerIteratorTest extends TestCase
                         '_index' => 'test-object',
                         '_type' => 'test-object',
                         '_score' => 1.0,
+                        '_id' => '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed',
                         '_source' => [
-                            'id' => '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed',
                             'timestamp' => '1991-11-24 02:00:00',
                         ],
                     ],
@@ -153,7 +154,6 @@ class PagerIteratorTest extends TestCase
                 ],
             ],
             '_source' => [
-                'id',
                 'timestamp',
             ],
             'sort' => [
@@ -162,6 +162,7 @@ class PagerIteratorTest extends TestCase
             ],
             'size' => 4,
             'seq_no_primary_term' => true,
+            'version' => true,
         ];
 
         $response = new Response([
@@ -180,8 +181,8 @@ class PagerIteratorTest extends TestCase
                         '_index' => 'test-object',
                         '_type' => 'test-object',
                         '_score' => 1.0,
+                        '_id' => '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed',
                         '_source' => [
-                            'id' => '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed',
                             'timestamp' => '1991-11-24 02:00:00',
                         ],
                     ],
@@ -189,8 +190,8 @@ class PagerIteratorTest extends TestCase
                         '_index' => 'test-object',
                         '_type' => 'test-object',
                         '_score' => 1.0,
+                        '_id' => 'af6394a4-7344-4fe8-9748-e6c67eba5ade',
                         '_source' => [
-                            'id' => 'af6394a4-7344-4fe8-9748-e6c67eba5ade',
                             'timestamp' => '1991-11-24 03:00:00',
                         ],
                     ],
@@ -198,8 +199,8 @@ class PagerIteratorTest extends TestCase
                         '_index' => 'test-object',
                         '_type' => 'test-object',
                         '_score' => 1.0,
+                        '_id' => '84810e2e-448f-4f58-acb8-4db1381f5de3',
                         '_source' => [
-                            'id' => '84810e2e-448f-4f58-acb8-4db1381f5de3',
                             'timestamp' => '1991-11-24 04:00:00',
                         ],
                     ],
@@ -207,8 +208,8 @@ class PagerIteratorTest extends TestCase
                         '_index' => 'test-object',
                         '_type' => 'test-object',
                         '_score' => 1.0,
+                        '_id' => 'eadd7470-95f5-47e8-8e74-083d45c307f6',
                         '_source' => [
-                            'id' => 'eadd7470-95f5-47e8-8e74-083d45c307f6',
                             'timestamp' => '1991-11-24 05:00:00',
                         ],
                     ],
@@ -240,7 +241,6 @@ class PagerIteratorTest extends TestCase
                 'bool' => (object) [],
             ],
             '_source' => [
-                'id',
                 'timestamp',
             ],
             'sort' => [
@@ -249,6 +249,7 @@ class PagerIteratorTest extends TestCase
             ],
             'size' => 3,
             'seq_no_primary_term' => true,
+            'version' => true,
         ];
 
         $response = new Response([
@@ -267,8 +268,8 @@ class PagerIteratorTest extends TestCase
                         '_index' => 'test-object',
                         '_type' => 'test-object',
                         '_score' => 1.0,
+                        '_id' => 'b4902bde-28d2-4ff9-8971-8bfeb3e943c1',
                         '_source' => [
-                            'id' => 'b4902bde-28d2-4ff9-8971-8bfeb3e943c1',
                             'timestamp' => '1991-11-24 00:00:00',
                         ],
                     ],
@@ -276,8 +277,8 @@ class PagerIteratorTest extends TestCase
                         '_index' => 'test-object',
                         '_type' => 'test-object',
                         '_score' => 1.0,
+                        '_id' => '191a54d8-990c-4ea7-9a23-0aed29d1fffe',
                         '_source' => [
-                            'id' => '191a54d8-990c-4ea7-9a23-0aed29d1fffe',
                             'timestamp' => '1991-11-24 01:00:00',
                         ],
                     ],
@@ -285,8 +286,8 @@ class PagerIteratorTest extends TestCase
                         '_index' => 'test-object',
                         '_type' => 'test-object',
                         '_score' => 1.0,
+                        '_id' => '84810e2e-448f-4f58-acb8-4db1381f5de3',
                         '_source' => [
-                            'id' => '84810e2e-448f-4f58-acb8-4db1381f5de3',
                             'timestamp' => '1991-11-24 01:00:00',
                         ],
                     ],
@@ -328,7 +329,6 @@ class PagerIteratorTest extends TestCase
                 ],
             ],
             '_source' => [
-                'id',
                 'timestamp',
             ],
             'sort' => [
@@ -337,6 +337,7 @@ class PagerIteratorTest extends TestCase
             ],
             'size' => 5,
             'seq_no_primary_term' => true,
+            'version' => true,
         ];
 
         $response = new Response([
@@ -355,8 +356,8 @@ class PagerIteratorTest extends TestCase
                         '_index' => 'test-object',
                         '_type' => 'test-object',
                         '_score' => 1.0,
+                        '_id' => '191a54d8-990c-4ea7-9a23-0aed29d1fffe',
                         '_source' => [
-                            'id' => '191a54d8-990c-4ea7-9a23-0aed29d1fffe',
                             'timestamp' => '1991-11-24 01:00:00',
                         ],
                     ],
@@ -364,8 +365,8 @@ class PagerIteratorTest extends TestCase
                         '_index' => 'test-object',
                         '_type' => 'test-object',
                         '_score' => 1.0,
+                        '_id' => '84810e2e-448f-4f58-acb8-4db1381f5de3',
                         '_source' => [
-                            'id' => '84810e2e-448f-4f58-acb8-4db1381f5de3',
                             'timestamp' => '1991-11-24 01:00:00',
                         ],
                     ],
@@ -373,8 +374,8 @@ class PagerIteratorTest extends TestCase
                         '_index' => 'test-object',
                         '_type' => 'test-object',
                         '_score' => 1.0,
+                        '_id' => '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed',
                         '_source' => [
-                            'id' => '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed',
                             'timestamp' => '1991-11-24 01:00:00',
                         ],
                     ],
@@ -382,8 +383,8 @@ class PagerIteratorTest extends TestCase
                         '_index' => 'test-object',
                         '_type' => 'test-object',
                         '_score' => 1.0,
+                        '_id' => 'af6394a4-7344-4fe8-9748-e6c67eba5ade',
                         '_source' => [
-                            'id' => 'af6394a4-7344-4fe8-9748-e6c67eba5ade',
                             'timestamp' => '1991-11-24 01:00:00',
                         ],
                     ],
@@ -391,8 +392,8 @@ class PagerIteratorTest extends TestCase
                         '_index' => 'test-object',
                         '_type' => 'test-object',
                         '_score' => 1.0,
+                        '_id' => 'eadd7470-95f5-47e8-8e74-083d45c307f6',
                         '_source' => [
-                            'id' => 'eadd7470-95f5-47e8-8e74-083d45c307f6',
                             'timestamp' => '1991-11-24 02:00:00',
                         ],
                     ],
@@ -425,7 +426,6 @@ class PagerIteratorTest extends TestCase
                 ],
             ],
             '_source' => [
-                'id',
                 'timestamp',
             ],
             'sort' => [
@@ -434,6 +434,7 @@ class PagerIteratorTest extends TestCase
             ],
             'size' => 4,
             'seq_no_primary_term' => true,
+            'version' => true,
         ];
 
         $response = new Response([
@@ -452,8 +453,8 @@ class PagerIteratorTest extends TestCase
                         '_index' => 'test-object',
                         '_type' => 'test-object',
                         '_score' => 1.0,
+                        '_id' => '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed',
                         '_source' => [
-                            'id' => '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed',
                             'timestamp' => '1991-11-24 02:30:00',
                         ],
                     ],
@@ -461,8 +462,8 @@ class PagerIteratorTest extends TestCase
                         '_index' => 'test-object',
                         '_type' => 'test-object',
                         '_score' => 1.0,
+                        '_id' => 'af6394a4-7344-4fe8-9748-e6c67eba5ade',
                         '_source' => [
-                            'id' => 'af6394a4-7344-4fe8-9748-e6c67eba5ade',
                             'timestamp' => '1991-11-24 03:00:00',
                         ],
                     ],
@@ -470,8 +471,8 @@ class PagerIteratorTest extends TestCase
                         '_index' => 'test-object',
                         '_type' => 'test-object',
                         '_score' => 1.0,
+                        '_id' => '84810e2e-448f-4f58-acb8-4db1381f5de3',
                         '_source' => [
-                            'id' => '84810e2e-448f-4f58-acb8-4db1381f5de3',
                             'timestamp' => '1991-11-24 04:00:00',
                         ],
                     ],
@@ -479,8 +480,8 @@ class PagerIteratorTest extends TestCase
                         '_index' => 'test-object',
                         '_type' => 'test-object',
                         '_score' => 1.0,
+                        '_id' => 'eadd7470-95f5-47e8-8e74-083d45c307f6',
                         '_source' => [
-                            'id' => 'eadd7470-95f5-47e8-8e74-083d45c307f6',
                             'timestamp' => '1991-11-24 05:00:00',
                         ],
                     ],
@@ -520,7 +521,6 @@ class PagerIteratorTest extends TestCase
                 ],
             ],
             '_source' => [
-                'id',
                 'timestamp',
             ],
             'sort' => [
@@ -529,6 +529,7 @@ class PagerIteratorTest extends TestCase
             ],
             'size' => 4,
             'seq_no_primary_term' => true,
+            'version' => true,
         ];
 
         $response = new Response([
@@ -547,8 +548,8 @@ class PagerIteratorTest extends TestCase
                         '_index' => 'test-object',
                         '_type' => 'test-object',
                         '_score' => 1.0,
+                        '_id' => 'af6394a4-7344-4fe8-9748-e6c67eba5ade',
                         '_source' => [
-                            'id' => 'af6394a4-7344-4fe8-9748-e6c67eba5ade',
                             'timestamp' => '1991-11-24 02:00:00',
                         ],
                     ],
@@ -556,8 +557,8 @@ class PagerIteratorTest extends TestCase
                         '_index' => 'test-object',
                         '_type' => 'test-object',
                         '_score' => 1.0,
+                        '_id' => '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed',
                         '_source' => [
-                            'id' => '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed',
                             'timestamp' => '1991-11-24 03:00:00',
                         ],
                     ],
@@ -565,8 +566,8 @@ class PagerIteratorTest extends TestCase
                         '_index' => 'test-object',
                         '_type' => 'test-object',
                         '_score' => 1.0,
+                        '_id' => '191a54d8-990c-4ea7-9a23-0aed29d1fffe',
                         '_source' => [
-                            'id' => '191a54d8-990c-4ea7-9a23-0aed29d1fffe',
                             'timestamp' => '1991-11-24 04:00:00',
                         ],
                     ],
@@ -574,8 +575,8 @@ class PagerIteratorTest extends TestCase
                         '_index' => 'test-object',
                         '_type' => 'test-object',
                         '_score' => 1.0,
+                        '_id' => 'eadd7470-95f5-47e8-8e74-083d45c307f6',
                         '_source' => [
-                            'id' => 'eadd7470-95f5-47e8-8e74-083d45c307f6',
                             'timestamp' => '1991-11-24 05:00:00',
                         ],
                     ],

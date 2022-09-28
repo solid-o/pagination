@@ -7,6 +7,7 @@ namespace Solido\Pagination;
 use Closure;
 use Generator;
 use Iterator;
+use ReturnTypeWillChange;
 use RuntimeException;
 use Solido\Pagination\Accessor\DateTimeValueAccessor;
 use Solido\Pagination\Accessor\ValueAccessor;
@@ -92,6 +93,7 @@ class PagerIterator implements Iterator
      *
      * @return mixed
      */
+    #[ReturnTypeWillChange]
     public function current()
     {
         assert($this->page !== null);
@@ -111,6 +113,7 @@ class PagerIterator implements Iterator
      *
      * @return mixed
      */
+    #[ReturnTypeWillChange]
     public function key()
     {
         assert($this->page !== null);

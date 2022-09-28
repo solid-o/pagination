@@ -10,6 +10,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Types;
 use Refugis\DoctrineExtra\DBAL\IteratorTrait;
 use Refugis\DoctrineExtra\ObjectIteratorInterface;
+use ReturnTypeWillChange;
 use Solido\Pagination\Orderings;
 use Solido\Pagination\PagerIterator as BaseIterator;
 
@@ -46,6 +47,7 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
     /**
      * {@inheritdoc}
      */
+    #[ReturnTypeWillChange]
     public function current()
     {
         if (! $this->valid()) {
