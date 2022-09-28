@@ -29,6 +29,7 @@
         "doctrine/dbal": "^2.10 || ^3.0",
         "doctrine/orm": "^2.7 || ^3.0",
         "doctrine/phpcr-odm": "^1.5",
+        "friendsofphp/proxy-manager-lts": "^1.0",
         "jackalope/jackalope-doctrine-dbal": "^1.4",
         "phpunit/phpunit": "^9.4",
         "psr/http-message": "^1.0",
