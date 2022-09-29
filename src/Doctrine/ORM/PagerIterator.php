@@ -34,7 +34,10 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
     public const FETCH_LAZY = 'LAZY';
     use IteratorTrait;
 
-    /** @var array<string, array<string, string>> */
+    /**
+     * @var array<string, array<string, string>>
+     * @phpstan-var array<class-string, array<string, string>>
+     */
     private array $fetchModes = [];
 
     /**
@@ -67,6 +70,9 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
         $this->currentElement = parent::current();
     }
 
+    /**
+     * @phpstan-param class-string $className
+     */
     public function setFetchMode(string $className, string $associationName, string $fetchMode): void
     {
         if ($fetchMode !== self::FETCH_EAGER && $fetchMode !== self::FETCH_LAZY) {
