@@ -8,11 +8,13 @@ use DateTimeImmutable;
 use Doctrine\DBAL\Types\DateTimeType;
 use Doctrine\DBAL\Types\DateTimeTzType;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Refugis\DoctrineExtra\ObjectIteratorInterface;
 use Refugis\DoctrineExtra\ORM\IteratorTrait;
 use Solido\Pagination\Orderings;
 use Solido\Pagination\PagerIterator as BaseIterator;
+use TypeError;
 
 use function array_shift;
 use function array_unshift;
@@ -21,12 +23,19 @@ use function implode;
 use function in_array;
 use function is_string;
 use function iterator_to_array;
+use function Safe\sprintf;
 use function strpos;
 use function strtoupper;
+use function var_export;
 
 final class PagerIterator extends BaseIterator implements ObjectIteratorInterface
 {
+    public const FETCH_EAGER = 'EAGER';
+    public const FETCH_LAZY = 'LAZY';
     use IteratorTrait;
+
+    /** @var array<string, array<string, string>> */
+    private array $fetchModes = [];
 
     /**
      * @param Orderings|string[]|string[][] $orderBy
@@ -56,6 +65,15 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
 
         $this->current = null;
         $this->currentElement = parent::current();
+    }
+
+    public function setFetchMode(string $className, string $associationName, string $fetchMode): void
+    {
+        if ($fetchMode !== self::FETCH_EAGER && $fetchMode !== self::FETCH_LAZY) {
+            throw new TypeError(sprintf('Argument #3 (fetchMode) must be one of %s::FETCH_* constants, %s given.', self::class, var_export($fetchMode, true)));
+        }
+
+        $this->fetchModes[$className][$associationName] = $fetchMode;
     }
 
     /**
@@ -122,7 +140,14 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
         }
 
         $queryBuilder->setMaxResults($limit);
+        $query = $queryBuilder->getQuery();
 
-        return $queryBuilder->getQuery()->getResult();
+        foreach ($this->fetchModes as $class => $associations) {
+            foreach ($associations as $association => $fetchMode) {
+                $query->setFetchMode($class, $association, $fetchMode === self::FETCH_EAGER ? ClassMetadata::FETCH_EAGER : ClassMetadata::FETCH_LAZY);
+            }
+        }
+
+        return $query->getResult();
     }
 }

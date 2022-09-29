@@ -268,4 +268,43 @@ class PagerIteratorTest extends TestCase
 
         self::assertEquals('3_1_7gqxdp', (string) $this->iterator->getNextPageToken());
     }
+
+    public function testPagerShouldRespectEagerFetchMode(): void
+    {
+        $this->queryBuilder = $this->getEntityManager()->createQueryBuilder();
+        $this->queryBuilder->select('a')
+            ->from(TestObject::class, 'a');
+
+        $this->iterator = new PagerIterator($this->queryBuilder, ['timestamp', 'id']);
+        $this->iterator->setPageSize(3);
+        $this->iterator->setFetchMode(TestObject::class, 'related', PagerIterator::FETCH_EAGER);
+
+        $this->queryLike(
+            'SELECT t0_.id AS id_0, t0_.timestamp AS timestamp_1, t0_.related_id AS related_id_2 FROM TestObject t0_ ORDER BY t0_.timestamp ASC, t0_.id ASC LIMIT 3',
+            [],
+            [
+                ['id_0' => 'af6394a4-7344-4fe8-9748-e6c67eba5ade', 'timestamp_1' => '1991-11-24 02:00:00', 'id_2' => '1', 'related_id_2' => '1'],
+                ['id_0' => '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', 'timestamp_1' => '1991-11-24 03:00:00', 'id_2' => '2', 'related_id_2' => '2'],
+                ['id_0' => '191a54d8-990c-4ea7-9a23-0aed29d1fffe', 'timestamp_1' => '1991-11-24 04:00:00', 'id_2' => '2', 'related_id_2' => '2'],
+                ['id_0' => 'eadd7470-95f5-47e8-8e74-083d45c307f6', 'timestamp_1' => '1991-11-24 05:00:00', 'id_2' => '4', 'related_id_2' => '4'],
+            ]
+        );
+
+        $this->queryLike(
+            'SELECT t0.id AS id_1 FROM RelatedTestObject t0 WHERE t0.id IN (?, ?, ?)',
+            ['1', '2', '4'],
+            [
+                ['id_1' => '1'],
+                ['id_1' => '2'],
+                ['id_1' => '4'],
+            ]
+        );
+
+        $objects = iterator_to_array($this->iterator);
+        self::assertEquals([
+            'af6394a4-7344-4fe8-9748-e6c67eba5ade',
+            '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed',
+            '191a54d8-990c-4ea7-9a23-0aed29d1fffe',
+        ], array_column($objects, 'id'));
+    }
 }
