@@ -8,17 +8,11 @@ use DateTimeInterface;
 
 final class DateTimeValueAccessor implements ValueAccessorInterface
 {
-    private ValueAccessorInterface $decorated;
-
-    public function __construct(ValueAccessorInterface $decorated)
+    public function __construct(private ValueAccessorInterface $decorated)
     {
-        $this->decorated = $decorated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getValue(object $object, string $propertyPath)
+    public function getValue(object $object, string $propertyPath): mixed
     {
         $value = $this->decorated->getValue($object, $propertyPath);
         if ($value instanceof DateTimeInterface) {

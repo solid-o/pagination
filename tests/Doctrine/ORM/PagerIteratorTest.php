@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Solido\Pagination\Tests\Doctrine\ORM;
 
-use Cake\Chronos\Chronos;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use PHPUnit\Framework\TestCase;
@@ -105,9 +105,9 @@ class PagerIteratorTest extends TestCase
         $this->iterator->setToken(PageToken::fromRequest($request->reveal()));
 
         self::assertEquals([
-            new TestObject('b4902bde-28d2-4ff9-8971-8bfeb3e943c1', new Chronos('1991-11-24 00:00:00')),
-            new TestObject('191a54d8-990c-4ea7-9a23-0aed29d1fffe', new Chronos('1991-11-24 01:00:00')),
-            new TestObject('9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', new Chronos('1991-11-24 02:00:00')),
+            new TestObject('b4902bde-28d2-4ff9-8971-8bfeb3e943c1', new DateTimeImmutable('1991-11-24 00:00:00')),
+            new TestObject('191a54d8-990c-4ea7-9a23-0aed29d1fffe', new DateTimeImmutable('1991-11-24 01:00:00')),
+            new TestObject('9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', new DateTimeImmutable('1991-11-24 02:00:00')),
         ], iterator_to_array($this->iterator));
 
         self::assertEquals('bfdew0_1_1jvdwz4', (string) $this->iterator->getNextPageToken());
@@ -132,9 +132,9 @@ class PagerIteratorTest extends TestCase
         $this->iterator->setToken(PageToken::fromRequest($request->reveal()));
 
         self::assertEquals([
-            new TestObject('af6394a4-7344-4fe8-9748-e6c67eba5ade', new Chronos('1991-11-24 03:00:00')),
-            new TestObject('84810e2e-448f-4f58-acb8-4db1381f5de3', new Chronos('1991-11-24 04:00:00')),
-            new TestObject('eadd7470-95f5-47e8-8e74-083d45c307f6', new Chronos('1991-11-24 05:00:00')),
+            new TestObject('af6394a4-7344-4fe8-9748-e6c67eba5ade', new DateTimeImmutable('1991-11-24 03:00:00')),
+            new TestObject('84810e2e-448f-4f58-acb8-4db1381f5de3', new DateTimeImmutable('1991-11-24 04:00:00')),
+            new TestObject('eadd7470-95f5-47e8-8e74-083d45c307f6', new DateTimeImmutable('1991-11-24 05:00:00')),
         ], iterator_to_array($this->iterator));
 
         self::assertEquals('bfdn80_1_cukvcs', (string) $this->iterator->getNextPageToken());
@@ -158,9 +158,9 @@ class PagerIteratorTest extends TestCase
         $this->iterator->setToken(PageToken::fromRequest($request->reveal()));
 
         self::assertEquals([
-            new TestObject('b4902bde-28d2-4ff9-8971-8bfeb3e943c1', new Chronos('1991-11-24 00:00:00')),
-            new TestObject('191a54d8-990c-4ea7-9a23-0aed29d1fffe', new Chronos('1991-11-24 01:00:00')),
-            new TestObject('84810e2e-448f-4f58-acb8-4db1381f5de3', new Chronos('1991-11-24 01:00:00')),
+            new TestObject('b4902bde-28d2-4ff9-8971-8bfeb3e943c1', new DateTimeImmutable('1991-11-24 00:00:00')),
+            new TestObject('191a54d8-990c-4ea7-9a23-0aed29d1fffe', new DateTimeImmutable('1991-11-24 01:00:00')),
+            new TestObject('84810e2e-448f-4f58-acb8-4db1381f5de3', new DateTimeImmutable('1991-11-24 01:00:00')),
         ], iterator_to_array($this->iterator));
 
         self::assertEquals(2, $this->iterator->getNextPageToken()->getOffset());
@@ -183,9 +183,9 @@ class PagerIteratorTest extends TestCase
         );
 
         self::assertEquals([
-            new TestObject('9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', new Chronos('1991-11-24 01:00:00')),
-            new TestObject('af6394a4-7344-4fe8-9748-e6c67eba5ade', new Chronos('1991-11-24 01:00:00')),
-            new TestObject('eadd7470-95f5-47e8-8e74-083d45c307f6', new Chronos('1991-11-24 02:00:00')),
+            new TestObject('9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', new DateTimeImmutable('1991-11-24 01:00:00')),
+            new TestObject('af6394a4-7344-4fe8-9748-e6c67eba5ade', new DateTimeImmutable('1991-11-24 01:00:00')),
+            new TestObject('eadd7470-95f5-47e8-8e74-083d45c307f6', new DateTimeImmutable('1991-11-24 02:00:00')),
         ], iterator_to_array($this->iterator));
     }
 
@@ -208,9 +208,9 @@ class PagerIteratorTest extends TestCase
         $this->iterator->setToken(PageToken::fromRequest($request->reveal()));
 
         self::assertEquals([
-            new TestObject('9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', new Chronos('1991-11-24 02:30:00')),
-            new TestObject('af6394a4-7344-4fe8-9748-e6c67eba5ade', new Chronos('1991-11-24 03:00:00')),
-            new TestObject('84810e2e-448f-4f58-acb8-4db1381f5de3', new Chronos('1991-11-24 04:00:00')),
+            new TestObject('9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', new DateTimeImmutable('1991-11-24 02:30:00')),
+            new TestObject('af6394a4-7344-4fe8-9748-e6c67eba5ade', new DateTimeImmutable('1991-11-24 03:00:00')),
+            new TestObject('84810e2e-448f-4f58-acb8-4db1381f5de3', new DateTimeImmutable('1991-11-24 04:00:00')),
         ], iterator_to_array($this->iterator));
 
         self::assertEquals('bfdkg0_1_1xirtcr', (string) $this->iterator->getNextPageToken());
@@ -235,9 +235,9 @@ class PagerIteratorTest extends TestCase
         $this->iterator->setToken(PageToken::fromRequest($request->reveal()));
 
         self::assertEquals([
-            new TestObject('af6394a4-7344-4fe8-9748-e6c67eba5ade', new Chronos('1991-11-24 02:00:00')),
-            new TestObject('9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', new Chronos('1991-11-24 03:00:00')),
-            new TestObject('191a54d8-990c-4ea7-9a23-0aed29d1fffe', new Chronos('1991-11-24 04:00:00')),
+            new TestObject('af6394a4-7344-4fe8-9748-e6c67eba5ade', new DateTimeImmutable('1991-11-24 02:00:00')),
+            new TestObject('9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', new DateTimeImmutable('1991-11-24 03:00:00')),
+            new TestObject('191a54d8-990c-4ea7-9a23-0aed29d1fffe', new DateTimeImmutable('1991-11-24 04:00:00')),
         ], iterator_to_array($this->iterator));
 
         self::assertEquals('bfdkg0_1_7gqxdp', (string) $this->iterator->getNextPageToken());

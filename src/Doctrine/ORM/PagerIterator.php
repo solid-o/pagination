@@ -44,7 +44,7 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
      * @param Orderings|string[]|string[][] $orderBy
      * @phpstan-param Orderings|array<string>|array<string, 'asc'|'desc'>|array<array{string, 'asc'|'desc'}> $orderBy
      */
-    public function __construct(QueryBuilder $searchable, $orderBy)
+    public function __construct(QueryBuilder $searchable, Orderings|array $orderBy)
     {
         $this->queryBuilder = clone $searchable;
         $this->totalCount = null;
@@ -70,9 +70,7 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
         $this->currentElement = parent::current();
     }
 
-    /**
-     * @phpstan-param class-string $className
-     */
+    /** @phpstan-param class-string $className */
     public function setFetchMode(string $className, string $associationName, string $fetchMode): void
     {
         if ($fetchMode !== self::FETCH_EAGER && $fetchMode !== self::FETCH_LAZY) {
@@ -142,7 +140,7 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
 
             $direction = $mainOrder[0][1] === Orderings::SORT_ASC ? '>=' : '<=';
             $queryBuilder->andWhere($mainOrder[0][0] . ' ' . $direction . ' :timeLimit');
-            $queryBuilder->setParameter('timeLimit', $timestamp, $type !== null ? $type->getName() : null);
+            $queryBuilder->setParameter('timeLimit', $timestamp, $type?->getName());
         }
 
         $queryBuilder->setMaxResults($limit);

@@ -31,7 +31,7 @@ use function iterator_to_array;
 use function key;
 use function next;
 use function reset;
-use function Safe\uasort;
+use function uasort;
 
 class PagerIterator implements Iterator
 {
@@ -50,7 +50,7 @@ class PagerIterator implements Iterator
     /**
      * The current continuation token.
      */
-    protected ?PageToken $token;
+    protected PageToken|null $token;
 
     /**
      * The object array to be paginated.
@@ -60,7 +60,7 @@ class PagerIterator implements Iterator
     private array $objects;
 
     /** @var array<object>|null */
-    private ?array $page;
+    private array|null $page;
 
     private bool $valid;
 
@@ -69,13 +69,12 @@ class PagerIterator implements Iterator
      * @param Orderings|string[]|string[][] $orderBy
      * @phpstan-param Orderings|array<string>|array<string, 'asc'|'desc'>|array<array{string, 'asc'|'desc'}> $orderBy
      */
-    public function __construct(iterable $objects, $orderBy)
+    public function __construct(iterable $objects, Orderings|array $orderBy = new Orderings([]))
     {
         $this->pageSize = self::DEFAULT_PAGE_SIZE;
         $this->token = null;
         $this->page = null;
         $this->valid = false;
-
         $this->orderBy = $orderBy instanceof Orderings ? $orderBy : new Orderings($orderBy);
 
         if (count($this->orderBy) < 2) {
@@ -90,8 +89,6 @@ class PagerIterator implements Iterator
 
     /**
      * Return the current element.
-     *
-     * @return mixed
      */
     #[ReturnTypeWillChange]
     public function current()
@@ -110,11 +107,9 @@ class PagerIterator implements Iterator
 
     /**
      * Return the key of the current element
-     *
-     * @return mixed
      */
     #[ReturnTypeWillChange]
-    public function key()
+    public function key(): mixed
     {
         assert($this->page !== null);
 
@@ -154,7 +149,7 @@ class PagerIterator implements Iterator
      *
      * @return $this
      */
-    public function setToken(?PageToken $token): self
+    public function setToken(PageToken|null $token): self
     {
         $this->token = $token;
         $this->page = null;
@@ -165,7 +160,7 @@ class PagerIterator implements Iterator
     /**
      * Gets the token for the next page.
      */
-    public function getNextPageToken(): ?PageToken
+    public function getNextPageToken(): PageToken|null
     {
         if ($this->page === null) {
             $this->rewind();
@@ -332,12 +327,8 @@ class PagerIterator implements Iterator
 
     /**
      * Gets the reference datetime object for the given object.
-     *
-     * @param mixed $object
-     *
-     * @return mixed
      */
-    private function getOrderValueForObject($object)
+    private function getOrderValueForObject(mixed $object): mixed
     {
         return static::getAccessor()->getValue($object, $this->orderBy[0][0]);
     }
@@ -366,11 +357,8 @@ class PagerIterator implements Iterator
 
     /**
      * Sorting method, used to sort object array.
-     *
-     * @param mixed $a
-     * @param mixed $b
      */
-    private function sort($a, $b): int
+    private function sort(mixed $a, mixed $b): int
     {
         $accessor = static::getAccessor();
         $ord1 = $ord2 = [];

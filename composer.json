@@ -19,13 +19,12 @@
         "csfix": "vendor/bin/phpcbf --standard=Solido src/"
     },
     "require": {
-        "php": "^7.4 || ^8.0",
-        "solido/common": "^0.2 || ^0.3",
-        "symfony/property-access": "^4.4 || ^5.0 || ^6.0"
+        "php": "^8.1",
+        "solido/common": "^0.3 || ^0.4",
+        "symfony/property-access": "^5.4 || ^6.0"
     },
     "require-dev": {
-        "cakephp/chronos": "^2.0",
-        "doctrine/annotations": "^1.10",
+        "doctrine/annotations": "^2.0",
         "doctrine/dbal": "^2.10 || ^3.0",
         "doctrine/orm": "^2.7 || ^3.0",
         "doctrine/phpcr-odm": "^1.5",
@@ -37,9 +36,10 @@
         "refugis/elastica-odm": "2.x-dev",
         "roave/security-advisories": "dev-master",
         "solido/php-coding-standards": "dev-master",
-        "solido/test-utils": "^0.3",
-        "symfony/cache": "^4.4 || ^5.0 || ^6.0",
-        "symfony/http-foundation": "^4.4 || ^5.0 || ^6.0"
+        "solido/test-utils": "dev-master",
+        "symfony/cache": "^5.4 || ^6.0",
+        "symfony/http-foundation": "^5.4 || ^6.0",
+        "symfony/var-dumper": "*"
     },
     "autoload": {
         "psr-4": {
@@ -60,11 +60,11 @@
         }
     },
     "archive": {
-        "exclude": [ ".gitignore", ".travis.yml", "tests" ]
+        "exclude": [ ".gitignore", ".github", "tests" ]
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "0.3.x-dev"
+            "dev-master": "0.4.x-dev"
         }
     }
 }

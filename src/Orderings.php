@@ -57,10 +57,8 @@ final class Orderings implements Countable, IteratorAggregate, ArrayAccess
 
     /**
      * Whether a offset exists
-     *
-     * @param string|int $offset
      */
-    public function offsetExists($offset): bool
+    public function offsetExists(mixed $offset): bool
     {
         return isset($this->orderings[$offset]);
     }
@@ -68,32 +66,25 @@ final class Orderings implements Countable, IteratorAggregate, ArrayAccess
     /**
      * Offset to retrieve
      *
-     * @param string|int $offset
-     *
      * @return array<string>
      */
-    public function offsetGet($offset): array
+    public function offsetGet(mixed $offset): array
     {
         return $this->orderings[$offset];
     }
 
     /**
      * Offset to set
-     *
-     * @param string|int|null $offset
-     * @param mixed $value
      */
-    public function offsetSet($offset, $value): void
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         // Do nothing.
     }
 
     /**
      * Offset to unset
-     *
-     * @param string|int|null $offset
      */
-    public function offsetUnset($offset): void
+    public function offsetUnset(mixed $offset): void
     {
         // Do nothing.
     }

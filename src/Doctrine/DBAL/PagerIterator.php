@@ -34,7 +34,7 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
      * @param Orderings|string[]|string[][] $orderBy
      * @phpstan-param Orderings|array<string>|array<string, 'asc'|'desc'>|array<array{string, 'asc'|'desc'}> $orderBy
      */
-    public function __construct(QueryBuilder $queryBuilder, $orderBy)
+    public function __construct(QueryBuilder $queryBuilder, Orderings|array $orderBy)
     {
         $this->queryBuilder = clone $queryBuilder;
         $this->totalCount = null;
@@ -44,11 +44,8 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
         parent::__construct([], $orderBy);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     #[ReturnTypeWillChange]
-    public function current()
+    public function current(): mixed
     {
         if (! $this->valid()) {
             return null;
@@ -125,9 +122,7 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
         return array_map(static fn (array $d): object => (object) $d, $result->fetchAllAssociative());
     }
 
-    /**
-     * @return array<object>
-     */
+    /** @return array<object> */
     private static function toArray(object $rowObject): array
     {
         return json_decode(json_encode($rowObject, JSON_THROW_ON_ERROR, 512), true, 512, JSON_THROW_ON_ERROR);

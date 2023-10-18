@@ -23,13 +23,13 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
     use IteratorTrait;
 
     private Search $search;
-    private ?int $totalCount;
+    private int|null $totalCount;
 
     /**
      * @param Orderings|string[]|string[][] $orderBy
      * @phpstan-param Orderings|array<string>|array<string, 'asc'|'desc'>|array<array{string, 'asc'|'desc'}> $orderBy
      */
-    public function __construct(Search $search, $orderBy)
+    public function __construct(Search $search, Orderings|array $orderBy)
     {
         $this->search = clone $search;
         $this->totalCount = null;
@@ -96,9 +96,7 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
 
             $documentManager = $this->search->getDocumentManager();
 
-            /**
-             * @phpstan-var class-string $documentClass
-             */
+            /** @phpstan-var class-string $documentClass */
             $documentClass = $this->search->getDocumentClass();
             assert(is_string($documentClass));
 

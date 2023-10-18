@@ -8,17 +8,11 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 final class ValueAccessor implements ValueAccessorInterface
 {
-    private PropertyAccessorInterface $propertyAccessor;
-
-    public function __construct(PropertyAccessorInterface $propertyAccessor)
+    public function __construct(private PropertyAccessorInterface $propertyAccessor)
     {
-        $this->propertyAccessor = $propertyAccessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getValue(object $object, string $propertyPath)
+    public function getValue(object $object, string $propertyPath): mixed
     {
         return $this->propertyAccessor->getValue($object, $propertyPath);
     }

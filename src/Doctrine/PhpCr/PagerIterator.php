@@ -34,7 +34,7 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
      * @param Orderings|string[]|string[][] $orderBy
      * @phpstan-param Orderings|array<string>|array<string, 'asc'|'desc'>|array<array{string, 'asc'|'desc'}> $orderBy
      */
-    public function __construct(QueryBuilder $searchable, $orderBy)
+    public function __construct(QueryBuilder $searchable, Orderings|array $orderBy)
     {
         $this->queryBuilder = clone $searchable;
         $this->totalCount = null;
@@ -82,9 +82,7 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
             return $this->dm;
         })->bindTo($converter, ConverterPhpcr::class)();
 
-        /**
-         * @phpstan-var class-string $documentFqn
-         */
+        /** @phpstan-var class-string $documentFqn */
         $documentFqn = $source->getDocumentFqn();
         assert(is_string($documentFqn));
 
@@ -107,9 +105,7 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
             $limit += $this->token->getOffset();
             $mainOrder = $this->orderBy[0];
 
-            /**
-             * @phpstan-var class-string $sourceFqn
-             */
+            /** @phpstan-var class-string $sourceFqn */
             $sourceFqn = $source->getDocumentFqn();
             assert(is_string($sourceFqn));
 

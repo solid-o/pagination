@@ -41,10 +41,8 @@ final class PageToken
 
     /**
      * The value used as starting point to "cut" the object set.
-     *
-     * @var mixed
      */
-    private $orderValue;
+    private mixed $orderValue;
 
     /**
      * How many elements should be skipped from the filtered set.
@@ -56,10 +54,7 @@ final class PageToken
      */
     private int $checksum;
 
-    /**
-     * @param mixed $orderValue
-     */
-    public function __construct($orderValue, int $offset, int $checksum)
+    public function __construct(mixed $orderValue, int $offset, int $checksum)
     {
         if ($offset < 1) {
             throw new InvalidArgumentException('Offset cannot be less than 1');
@@ -121,7 +116,7 @@ final class PageToken
         return new self(
             $orderValue,
             (int) $offset,
-            (int) base_convert($checksum, 36, 10)
+            (int) base_convert($checksum, 36, 10),
         );
     }
 
@@ -143,7 +138,7 @@ final class PageToken
     /**
      * Extract the token from the request and parses it.
      */
-    public static function fromRequest(object $request): ?self
+    public static function fromRequest(object $request): self|null
     {
         if (! $request instanceof RequestAdapterInterface) {
             $adapterFactory = new AdapterFactory();
@@ -160,10 +155,8 @@ final class PageToken
 
     /**
      * Gets the page order value (starting point).
-     *
-     * @return mixed
      */
-    public function getOrderValue()
+    public function getOrderValue(): mixed
     {
         return $this->orderValue;
     }

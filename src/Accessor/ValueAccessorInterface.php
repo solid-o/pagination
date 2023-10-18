@@ -8,8 +8,6 @@ interface ValueAccessorInterface
 {
     /**
      * Gets an object value at given path.
-     *
-     * @return mixed
      */
-    public function getValue(object $object, string $propertyPath);
+    public function getValue(object $object, string $propertyPath): mixed;
 }
