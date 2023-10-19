@@ -99,12 +99,6 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
     {
         $queryBuilder = clone $this->queryBuilder;
         $queryBuilder->setFirstResult(0);
-
-        $queryBuilder = $this->queryBuilder->getConnection()
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('(' . $queryBuilder->getSQL() . ')', 'x');
-
         foreach ($this->orderBy as $key => [$field, $direction]) {
             $method = $key === 0 ? 'orderBy' : 'addOrderBy';
             $queryBuilder->{$method}($field, strtoupper($direction));

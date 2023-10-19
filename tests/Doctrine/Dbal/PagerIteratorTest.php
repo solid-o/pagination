@@ -40,7 +40,7 @@ class PagerIteratorTest extends TestCase
     public function testPagerShouldGenerateFirstPageWithToken(): void
     {
         $this->queryLike(
-            'SELECT * FROM (SELECT t.id, t.timestamp FROM test_table t) x ORDER BY timestamp ASC, id ASC LIMIT 3',
+            'SELECT t.id, t.timestamp FROM test_table t ORDER BY timestamp ASC, id ASC LIMIT 3',
             [],
             [
                 ['id' => 'b4902bde-28d2-4ff9-8971-8bfeb3e943c1', 'timestamp' => '1991-11-24 00:00:00'],
@@ -66,7 +66,7 @@ class PagerIteratorTest extends TestCase
     public function testPagerShouldGenerateSecondPageWithTokenAndLastPage(): void
     {
         $this->queryLike(
-            'SELECT * FROM (SELECT t.id, t.timestamp FROM test_table t) x WHERE timestamp >= ? ORDER BY timestamp ASC, id ASC LIMIT 4',
+            'SELECT t.id, t.timestamp FROM test_table t WHERE timestamp >= ? ORDER BY timestamp ASC, id ASC LIMIT 4',
             ['1991-11-24 02:00:00'],
             [
                 ['id' => '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', 'timestamp' => '1991-11-24 02:00:00'],
@@ -93,7 +93,7 @@ class PagerIteratorTest extends TestCase
     public function testOffsetShouldWork(): void
     {
         $this->queryLike(
-            'SELECT * FROM (SELECT t.id, t.timestamp FROM test_table t) x ORDER BY timestamp ASC, id ASC LIMIT 3',
+            'SELECT t.id, t.timestamp FROM test_table t ORDER BY timestamp ASC, id ASC LIMIT 3',
             [],
             [
                 ['id' => 'b4902bde-28d2-4ff9-8971-8bfeb3e943c1', 'timestamp' => '1991-11-24 00:00:00'],
@@ -121,7 +121,7 @@ class PagerIteratorTest extends TestCase
         $this->iterator->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
         $this->queryLike(
-            'SELECT * FROM (SELECT t.id, t.timestamp FROM test_table t) x WHERE timestamp >= ? ORDER BY timestamp ASC, id ASC LIMIT 5',
+            'SELECT t.id, t.timestamp FROM test_table t WHERE timestamp >= ? ORDER BY timestamp ASC, id ASC LIMIT 5',
             ['1991-11-24 01:00:00'],
             [
                 ['id' => '191a54d8-990c-4ea7-9a23-0aed29d1fffe', 'timestamp' => '1991-11-24 01:00:00'],
@@ -142,7 +142,7 @@ class PagerIteratorTest extends TestCase
     public function testPagerShouldReturnFirstPageWithTimestampDifference(): void
     {
         $this->queryLike(
-            'SELECT * FROM (SELECT t.id, t.timestamp FROM test_table t) x WHERE timestamp >= ? ORDER BY timestamp ASC, id ASC LIMIT 4',
+            'SELECT t.id, t.timestamp FROM test_table t WHERE timestamp >= ? ORDER BY timestamp ASC, id ASC LIMIT 4',
             ['1991-11-24 02:00:00'],
             [
                 ['id' => '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', 'timestamp' => '1991-11-24 02:30:00'],
@@ -169,7 +169,7 @@ class PagerIteratorTest extends TestCase
     public function testPagerShouldReturnFirstPageWithChecksumDifference(): void
     {
         $this->queryLike(
-            'SELECT * FROM (SELECT t.id, t.timestamp FROM test_table t) x WHERE timestamp >= ? ORDER BY timestamp ASC, id ASC LIMIT 4',
+            'SELECT t.id, t.timestamp FROM test_table t WHERE timestamp >= ? ORDER BY timestamp ASC, id ASC LIMIT 4',
             ['1991-11-24 02:00:00'],
             [
                 ['id' => 'af6394a4-7344-4fe8-9748-e6c67eba5ade', 'timestamp' => '1991-11-24 02:00:00'],
@@ -204,7 +204,7 @@ class PagerIteratorTest extends TestCase
         $this->iterator->setPageSize(3);
 
         $this->queryLike(
-            'SELECT * FROM (SELECT t.id, t.timestamp FROM test_table t) x LIMIT 3 OFFSET 2',
+            'SELECT t.id, t.timestamp FROM test_table t LIMIT 3 OFFSET 2',
             [],
             [
                 ['id' => 'eadd7470-95f5-47e8-8e74-083d45c307f6', 'timestamp' => '1991-11-24 05:00:00'],
@@ -233,7 +233,7 @@ class PagerIteratorTest extends TestCase
         $this->iterator->setPageSize(3);
 
         $this->queryLike(
-            'SELECT * FROM (SELECT t.id, t.timestamp FROM test_table t) x LIMIT 3 OFFSET 3',
+            'SELECT t.id, t.timestamp FROM test_table t LIMIT 3 OFFSET 3',
             [],
             [
                 ['id' => '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', 'timestamp' => '1991-11-24 03:00:00'],
