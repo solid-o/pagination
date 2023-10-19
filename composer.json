@@ -20,7 +20,7 @@
     },
     "require": {
         "php": "^8.1",
-        "solido/common": "^0.3 || ^0.4",
+        "solido/common": "^0.4",
         "symfony/property-access": "^5.4 || ^6.0"
     },
     "require-dev": {

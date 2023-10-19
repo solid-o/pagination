@@ -382,5 +382,6 @@ class PagerIteratorTest extends TestCase
             '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed',
             '84810e2e-448f-4f58-acb8-4db1381f5de3',
         ], array_column($objects, 'id'));
+        self::assertNull($this->iterator->getNextPageToken());
     }
 }
