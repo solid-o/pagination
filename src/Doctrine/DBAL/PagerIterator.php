@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Solido\Pagination\Doctrine\DBAL;
 
+use BadMethodCallException;
 use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\FetchMode;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\Persistence\ObjectManager;
 use Refugis\DoctrineExtra\DBAL\IteratorTrait;
 use Refugis\DoctrineExtra\ObjectIteratorInterface;
 use RuntimeException;
@@ -81,7 +83,7 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function filterObjects(array $objects): array
     {
@@ -93,7 +95,7 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getObjects(): array
     {
@@ -142,5 +144,10 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
     private static function toArray(object $rowObject): array
     {
         return json_decode(json_encode($rowObject, JSON_THROW_ON_ERROR, 512), true, 512, JSON_THROW_ON_ERROR);
+    }
+
+    public function getObjectManager(): ObjectManager
+    {
+        throw new BadMethodCallException('Cannot retrieve the object manager from a DBAL iterator');
     }
 }

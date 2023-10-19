@@ -67,7 +67,7 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function filterObjects(array $objects): array
     {
@@ -79,7 +79,7 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getObjects(): array
     {

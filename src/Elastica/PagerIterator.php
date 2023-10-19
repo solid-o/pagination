@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Solido\Pagination\Elastica;
 
 use DateTimeImmutable;
+use Doctrine\Persistence\ObjectManager;
 use Elastica\Query;
 use Refugis\DoctrineExtra\IteratorTrait;
 use Refugis\DoctrineExtra\ObjectIteratorInterface;
@@ -68,7 +69,7 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function filterObjects(array $objects): array
     {
@@ -80,7 +81,7 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getObjects(): array
     {
@@ -145,5 +146,10 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
             ->setLimit($limit);
 
         return $search->execute();
+    }
+
+    public function getObjectManager(): ObjectManager
+    {
+        return $this->search->getDocumentManager();
     }
 }
