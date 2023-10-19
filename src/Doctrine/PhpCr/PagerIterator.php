@@ -14,6 +14,7 @@ use Doctrine\ODM\PHPCR\Query\Builder\From;
 use Doctrine\ODM\PHPCR\Query\Builder\OperandFactory;
 use Doctrine\ODM\PHPCR\Query\Builder\QueryBuilder;
 use Doctrine\ODM\PHPCR\Query\Builder\SourceDocument;
+use Doctrine\ODM\PHPCR\Query\Builder\SourceJoin;
 use ReflectionMethod;
 use Refugis\DoctrineExtra\ObjectIteratorInterface;
 use Refugis\DoctrineExtra\ODM\PhpCr\IteratorTrait;
@@ -87,6 +88,12 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
         $fromNode = $queryBuilder->getChildOfType(AbstractNode::NT_FROM);
         assert($fromNode instanceof From);
         $source = $fromNode->getChildOfType(AbstractNode::NT_SOURCE);
+        if ($source instanceof SourceJoin) {
+            $source = $source
+                ->getChildOfType(AbstractNode::NT_SOURCE_JOIN_LEFT)
+                ->getChildOfType(AbstractNode::NT_SOURCE);
+        }
+
         assert($source instanceof SourceDocument);
         $alias = $source->getAlias();
 
