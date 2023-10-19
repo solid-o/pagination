@@ -17,8 +17,9 @@ use function implode;
 use function is_numeric;
 use function Safe\base64_decode;
 use function Safe\preg_match;
-use function Safe\substr;
+use function str_starts_with;
 use function strpos;
+use function substr;
 
 /**
  * This class is the object representation of a ContinuousToken.
@@ -39,30 +40,23 @@ final class PageToken
 {
     public const TOKEN_DELIMITER = '_';
 
-    /**
-     * The value used as starting point to "cut" the object set.
-     */
-    private mixed $orderValue;
-
-    /**
-     * How many elements should be skipped from the filtered set.
-     */
-    private int $offset;
-
-    /**
-     * The checksum if the first $offset elements.
-     */
-    private int $checksum;
-
-    public function __construct(mixed $orderValue, int $offset, int $checksum)
-    {
+    public function __construct(
+        /**
+         * The value used as starting point to "cut" the object set.
+         */
+        private readonly mixed $orderValue,
+        /**
+         * How many elements should be skipped from the filtered set.
+         */
+        private readonly int $offset,
+        /**
+         * The checksum if the first $offset elements.
+         */
+        private readonly int $checksum,
+    ) {
         if ($offset < 1) {
             throw new InvalidArgumentException('Offset cannot be less than 1');
         }
-
-        $this->orderValue = $orderValue;
-        $this->offset = $offset;
-        $this->checksum = $checksum;
     }
 
     public function __toString(): string
@@ -107,7 +101,7 @@ final class PageToken
 
         [$orderValue, $offset, $checksum] = $tokenSplit;
 
-        if (strpos($orderValue, '=') === 0) {
+        if (str_starts_with($orderValue, '=')) {
             $orderValue = base64_decode(substr($orderValue, 1));
         } else {
             $orderValue = (int) base_convert($tokenSplit[0], 36, 10);

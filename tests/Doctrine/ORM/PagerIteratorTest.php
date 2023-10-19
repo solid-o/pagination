@@ -10,6 +10,8 @@ use Doctrine\ORM\QueryBuilder;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 use Solido\Pagination\Doctrine\ORM\PagerIterator;
+use Solido\Pagination\PageNumber;
+use Solido\Pagination\PageOffset;
 use Solido\Pagination\PageToken;
 use Solido\Pagination\Tests\RelatedTestObject;
 use Solido\Pagination\Tests\TestObject;
@@ -102,7 +104,7 @@ class PagerIteratorTest extends TestCase
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag([]);
 
-        $this->iterator->setToken(PageToken::fromRequest($request->reveal()));
+        $this->iterator->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
         self::assertEquals([
             new TestObject('b4902bde-28d2-4ff9-8971-8bfeb3e943c1', new DateTimeImmutable('1991-11-24 00:00:00')),
@@ -129,7 +131,7 @@ class PagerIteratorTest extends TestCase
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag(['continue' => 'bfdew0_1_1jvdwz4']);
 
-        $this->iterator->setToken(PageToken::fromRequest($request->reveal()));
+        $this->iterator->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
         self::assertEquals([
             new TestObject('af6394a4-7344-4fe8-9748-e6c67eba5ade', new DateTimeImmutable('1991-11-24 03:00:00')),
@@ -155,7 +157,7 @@ class PagerIteratorTest extends TestCase
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag([]);
 
-        $this->iterator->setToken(PageToken::fromRequest($request->reveal()));
+        $this->iterator->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
         self::assertEquals([
             new TestObject('b4902bde-28d2-4ff9-8971-8bfeb3e943c1', new DateTimeImmutable('1991-11-24 00:00:00')),
@@ -168,7 +170,7 @@ class PagerIteratorTest extends TestCase
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag(['continue' => 'bfdc40_2_hzr9o9']);
 
-        $this->iterator->setToken(PageToken::fromRequest($request->reveal()));
+        $this->iterator->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
         $this->queryLike(
             'SELECT t0_.id AS id_0, t0_.timestamp AS timestamp_1, t0_.related_id AS related_id_2 FROM TestObject t0_ WHERE t0_.timestamp >= ? ORDER BY t0_.timestamp ASC, t0_.id ASC LIMIT 5',
@@ -205,7 +207,7 @@ class PagerIteratorTest extends TestCase
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag(['continue' => 'bfdew0_1_1jvdwz4']); // This token represents a request with the 02:00:00 timestamp
 
-        $this->iterator->setToken(PageToken::fromRequest($request->reveal()));
+        $this->iterator->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
         self::assertEquals([
             new TestObject('9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', new DateTimeImmutable('1991-11-24 02:30:00')),
@@ -232,7 +234,7 @@ class PagerIteratorTest extends TestCase
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag(['continue' => 'bfdew0_1_1jvdwz4']); // This token represents a request with the 02:00:00 timestamp
 
-        $this->iterator->setToken(PageToken::fromRequest($request->reveal()));
+        $this->iterator->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
         self::assertEquals([
             new TestObject('af6394a4-7344-4fe8-9748-e6c67eba5ade', new DateTimeImmutable('1991-11-24 02:00:00')),
@@ -305,6 +307,80 @@ class PagerIteratorTest extends TestCase
             'af6394a4-7344-4fe8-9748-e6c67eba5ade',
             '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed',
             '191a54d8-990c-4ea7-9a23-0aed29d1fffe',
+        ], array_column($objects, 'id'));
+    }
+
+    public function testPageOffsetShouldWork(): void
+    {
+        $this->queryBuilder = $this->getEntityManager()->createQueryBuilder();
+        $this->queryBuilder->select('a')
+            ->from(TestObject::class, 'a');
+
+        $this->iterator = new PagerIterator($this->queryBuilder);
+        $this->iterator->setPageSize(3);
+
+        $this->queryLike(
+            'SELECT t0_.id AS id_0, t0_.timestamp AS timestamp_1, t0_.related_id AS related_id_2 FROM TestObject t0_ LIMIT 3 OFFSET 2',
+            [],
+            [
+                ['id_0' => 'eadd7470-95f5-47e8-8e74-083d45c307f6', 'timestamp_1' => '1991-11-24 05:00:00', 'related_id_2' => '1'],
+                ['id_0' => '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', 'timestamp_1' => '1991-11-24 03:00:00', 'related_id_2' => '2'],
+                ['id_0' => '84810e2e-448f-4f58-acb8-4db1381f5de3', 'timestamp_1' => '1991-11-24 04:00:00', 'related_id_2' => '2'],
+            ]
+        );
+
+        $this->queryLike(
+            'SELECT t0.id AS id_1 FROM RelatedTestObject t0 WHERE t0.id IN (?, ?)',
+            ['1', '2'],
+            [
+                ['id_1' => '1'],
+                ['id_1' => '2'],
+            ]
+        );
+
+        $this->iterator->setCurrentPage(new PageOffset(2));
+
+        $objects = iterator_to_array($this->iterator);
+        self::assertEquals([
+            'eadd7470-95f5-47e8-8e74-083d45c307f6',
+            '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed',
+            '84810e2e-448f-4f58-acb8-4db1381f5de3',
+        ], array_column($objects, 'id'));
+    }
+
+    public function testPageNumberShouldWork(): void
+    {
+        $this->queryBuilder = $this->getEntityManager()->createQueryBuilder();
+        $this->queryBuilder->select('a')
+            ->from(TestObject::class, 'a');
+
+        $this->iterator = new PagerIterator($this->queryBuilder);
+        $this->iterator->setPageSize(3);
+
+        $this->queryLike(
+            'SELECT t0_.id AS id_0, t0_.timestamp AS timestamp_1, t0_.related_id AS related_id_2 FROM TestObject t0_ LIMIT 3 OFFSET 3',
+            [],
+            [
+                ['id_0' => '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', 'timestamp_1' => '1991-11-24 03:00:00', 'related_id_2' => '1'],
+                ['id_0' => '84810e2e-448f-4f58-acb8-4db1381f5de3', 'timestamp_1' => '1991-11-24 04:00:00', 'related_id_2' => '1'],
+            ]
+        );
+
+        $this->queryLike(
+            'SELECT t0.id AS id_1 FROM RelatedTestObject t0 WHERE t0.id IN (?, ?)',
+            ['1', '2'],
+            [
+                ['id_1' => '1'],
+                ['id_1' => '2'],
+            ]
+        );
+
+        $this->iterator->setCurrentPage(new PageNumber(2));
+
+        $objects = iterator_to_array($this->iterator);
+        self::assertEquals([
+            '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed',
+            '84810e2e-448f-4f58-acb8-4db1381f5de3',
         ], array_column($objects, 'id'));
     }
 }

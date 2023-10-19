@@ -12,7 +12,10 @@ use Refugis\ODM\Elastica\Search\Search;
 use Refugis\ODM\Elastica\Type\AbstractDateTimeType;
 use Solido\Pagination\Exception\InvalidArgumentException;
 use Solido\Pagination\Orderings;
+use Solido\Pagination\PageNumber;
+use Solido\Pagination\PageOffset;
 use Solido\Pagination\PagerIterator as BaseIterator;
+use Solido\Pagination\PageToken;
 
 use function assert;
 use function is_string;
@@ -67,6 +70,18 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
     /**
      * {@inheritdoc}
      */
+    protected function filterObjects(array $objects): array
+    {
+        if ($this->currentPage instanceof PageToken) {
+            return parent::filterObjects($objects);
+        }
+
+        return $objects;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function getObjects(): array
     {
         $search = clone $this->search;
@@ -89,9 +104,9 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
         }
 
         $limit = $this->pageSize;
-        if ($this->token !== null) {
-            $timestamp = $this->token->getOrderValue();
-            $limit += $this->token->getOffset();
+        if ($this->currentPage instanceof PageToken) {
+            $timestamp = $this->currentPage->getOrderValue();
+            $limit += $this->currentPage->getOffset();
             $mainOrder = $this->orderBy[0];
 
             $documentManager = $this->search->getDocumentManager();
@@ -116,6 +131,12 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
             $direction = $mainOrder[1] === Orderings::SORT_ASC ? 'gte' : 'lte';
 
             $query->addFilter(new Query\Range($mainOrder[0], [$direction => $timestamp]));
+        } elseif ($this->currentPage instanceof PageNumber) {
+            $offset = ($this->currentPage->getPageNumber() - 1) * $limit;
+            $search->setOffset($offset);
+        } elseif ($this->currentPage instanceof PageOffset) {
+            $offset = $this->currentPage->getOffset();
+            $search->setOffset($offset);
         }
 
         $search

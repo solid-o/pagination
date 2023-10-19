@@ -10,14 +10,18 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Types;
 use Refugis\DoctrineExtra\DBAL\IteratorTrait;
 use Refugis\DoctrineExtra\ObjectIteratorInterface;
-use ReturnTypeWillChange;
+use RuntimeException;
 use Solido\Pagination\Orderings;
+use Solido\Pagination\PageNumber;
+use Solido\Pagination\PageOffset;
 use Solido\Pagination\PagerIterator as BaseIterator;
+use Solido\Pagination\PageToken;
 
 use function array_map;
 use function assert;
 use function call_user_func;
 use function class_exists;
+use function count;
 use function is_callable;
 use function is_object;
 use function json_decode;
@@ -34,7 +38,7 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
      * @param Orderings|string[]|string[][] $orderBy
      * @phpstan-param Orderings|array<string>|array<string, 'asc'|'desc'>|array<array{string, 'asc'|'desc'}> $orderBy
      */
-    public function __construct(QueryBuilder $queryBuilder, Orderings|array $orderBy)
+    public function __construct(QueryBuilder $queryBuilder, Orderings|array $orderBy = new Orderings([]))
     {
         $this->queryBuilder = clone $queryBuilder;
         $this->totalCount = null;
@@ -44,7 +48,6 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
         parent::__construct([], $orderBy);
     }
 
-    #[ReturnTypeWillChange]
     public function current(): mixed
     {
         if (! $this->valid()) {
@@ -80,18 +83,27 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
     /**
      * {@inheritdoc}
      */
+    protected function filterObjects(array $objects): array
+    {
+        if ($this->currentPage instanceof PageToken) {
+            return parent::filterObjects($objects);
+        }
+
+        return $objects;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function getObjects(): array
     {
         $queryBuilder = clone $this->queryBuilder;
-
-        $offset = $queryBuilder->getFirstResult();
         $queryBuilder->setFirstResult(0);
 
         $queryBuilder = $this->queryBuilder->getConnection()
             ->createQueryBuilder()
             ->select('*')
-            ->from('(' . $queryBuilder->getSQL() . ')', 'x')
-            ->setFirstResult($offset);
+            ->from('(' . $queryBuilder->getSQL() . ')', 'x');
 
         foreach ($this->orderBy as $key => [$field, $direction]) {
             $method = $key === 0 ? 'orderBy' : 'addOrderBy';
@@ -99,14 +111,24 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
         }
 
         $limit = $this->pageSize;
-        if ($this->token !== null) {
-            $timestamp = $this->token->getOrderValue();
-            $limit += $this->token->getOffset();
+        if ($this->currentPage instanceof PageToken) {
+            if (count($this->orderBy) < 2) {
+                throw new RuntimeException('orderBy must have at least 2 "field" => "direction(ASC|DESC)". The first is the reference timestamp, the second is the checksum field.');
+            }
+
+            $timestamp = $this->currentPage->getOrderValue();
+            $limit += $this->currentPage->getOffset();
             $mainOrder = $this->orderBy[0];
 
             $direction = $mainOrder[1] === Orderings::SORT_ASC ? '>=' : '<=';
             $queryBuilder->andWhere($mainOrder[0] . ' ' . $direction . ' :timeLimit');
             $queryBuilder->setParameter('timeLimit', $timestamp, Types::TEXT);
+        } elseif ($this->currentPage instanceof PageNumber) {
+            $offset = ($this->currentPage->getPageNumber() - 1) * $limit;
+            $queryBuilder->setFirstResult($offset);
+        } elseif ($this->currentPage instanceof PageOffset) {
+            $offset = $this->currentPage->getOffset();
+            $queryBuilder->setFirstResult($offset);
         }
 
         $queryBuilder->setMaxResults($limit);

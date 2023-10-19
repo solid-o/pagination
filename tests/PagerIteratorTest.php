@@ -7,6 +7,8 @@ namespace Solido\Pagination\Tests;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
+use Solido\Pagination\PageNumber;
+use Solido\Pagination\PageOffset;
 use Solido\Pagination\PagerIterator;
 use Solido\Pagination\PageToken;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -75,7 +77,7 @@ class PagerIteratorTest extends TestCase
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag([]);
 
-        $pager->setToken(PageToken::fromRequest($request->reveal()));
+        $pager->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
         self::assertEquals(
             [
@@ -103,7 +105,7 @@ class PagerIteratorTest extends TestCase
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag([]);
 
-        $pager->setToken(PageToken::fromRequest($request->reveal()));
+        $pager->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
         self::assertEquals(
             [
@@ -131,7 +133,7 @@ class PagerIteratorTest extends TestCase
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag(['continue' => 'bfdew0_1_1jvdwz4']);
 
-        $pager->setToken(PageToken::fromRequest($request->reveal()));
+        $pager->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
         self::assertEquals(
             [
@@ -159,7 +161,7 @@ class PagerIteratorTest extends TestCase
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag(['continue' => '=OWM1ZjZmZjctYjI4Zi00OGZiLWJhNDctOGJjYzNiMjM1YmVk_1_68lkk0']);
 
-        $pager->setToken(PageToken::fromRequest($request->reveal()));
+        $pager->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
         self::assertEquals(
             [
@@ -187,7 +189,7 @@ class PagerIteratorTest extends TestCase
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag([]);
 
-        $pager->setToken(PageToken::fromRequest($request->reveal()));
+        $pager->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
         self::assertEquals(
             [
@@ -203,7 +205,7 @@ class PagerIteratorTest extends TestCase
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag(['continue' => 'bfdc40_2_hzr9o9']);
 
-        $pager->setToken(PageToken::fromRequest($request->reveal()));
+        $pager->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
         self::assertEquals(
             [
@@ -226,7 +228,7 @@ class PagerIteratorTest extends TestCase
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag(['continue' => 'bfdew0_1_1jvdwz4']); // This token represents a request with the 02:00:00 timestamp
 
-        $pager->setToken(PageToken::fromRequest($request->reveal()));
+        $pager->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
         self::assertEquals(
             [
@@ -254,7 +256,7 @@ class PagerIteratorTest extends TestCase
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag(['continue' => 'bfdew0_1_1jvdwz4']); // This token represents a request with the 02:00:00 timestamp
 
-        $pager->setToken(PageToken::fromRequest($request->reveal()));
+        $pager->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
         self::assertEquals(
             [
@@ -268,6 +270,49 @@ class PagerIteratorTest extends TestCase
         self::assertEquals(
             'bfdkg0_1_7gqxdp',
             (string) $pager->getNextPageToken()
+        );
+    }
+
+    public function testPageOffsetShouldWork(): void
+    {
+        $pager = new PagerIterator($this->generatePageableInterfaceListFromArray(self::CASE_2, self::VALID_UUIDS));
+        $pager->setPageSize(self::PAGE_SIZE);
+        $pager->setCurrentPage(new PageOffset(2));
+
+        self::assertEquals(
+            [
+                new TestObject('9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', new DateTimeImmutable('1991-11-24 01:00:00')),
+                new TestObject('af6394a4-7344-4fe8-9748-e6c67eba5ade', new DateTimeImmutable('1991-11-24 01:00:00')),
+                new TestObject('84810e2e-448f-4f58-acb8-4db1381f5de3', new DateTimeImmutable('1991-11-24 01:00:00')),
+            ],
+            iterator_to_array($pager)
+        );
+    }
+
+    public function testPageNumberShouldWork(): void
+    {
+        $pager = new PagerIterator($this->generatePageableInterfaceListFromArray(self::CASE_2, self::VALID_UUIDS));
+        $pager->setPageSize(self::PAGE_SIZE);
+        $pager->setCurrentPage(new PageNumber(1));
+
+        self::assertEquals(
+            [
+                new TestObject('b4902bde-28d2-4ff9-8971-8bfeb3e943c1', new DateTimeImmutable('1991-11-24 00:00:00')),
+                new TestObject('191a54d8-990c-4ea7-9a23-0aed29d1fffe', new DateTimeImmutable('1991-11-24 01:00:00')),
+                new TestObject('9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', new DateTimeImmutable('1991-11-24 01:00:00')),
+            ],
+            iterator_to_array($pager)
+        );
+
+        $pager->setCurrentPage(new PageNumber(2));
+
+        self::assertEquals(
+            [
+                new TestObject('af6394a4-7344-4fe8-9748-e6c67eba5ade', new DateTimeImmutable('1991-11-24 01:00:00')),
+                new TestObject('84810e2e-448f-4f58-acb8-4db1381f5de3', new DateTimeImmutable('1991-11-24 01:00:00')),
+                new TestObject('eadd7470-95f5-47e8-8e74-083d45c307f6', new DateTimeImmutable('1991-11-24 02:00:00')),
+            ],
+            iterator_to_array($pager)
         );
     }
 }

@@ -8,10 +8,13 @@ use DateTimeImmutable;
 use Elastica\Query;
 use Elastica\Response;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use ReflectionClass;
 use Refugis\ODM\Elastica\Metadata\DocumentMetadata;
 use Refugis\ODM\Elastica\Metadata\FieldMetadata;
 use Solido\Pagination\Elastica\PagerIterator;
+use Solido\Pagination\PageNumber;
+use Solido\Pagination\PageOffset;
 use Solido\Pagination\PageToken;
 use Solido\Pagination\Tests\TestObject;
 use Solido\TestUtils\Elastica\DocumentManagerTrait;
@@ -127,7 +130,7 @@ class PagerIteratorTest extends TestCase
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag([]);
 
-        $this->iterator->setToken(PageToken::fromRequest($request->reveal()));
+        $this->iterator->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
         self::assertEquals([
             new TestObject('b4902bde-28d2-4ff9-8971-8bfeb3e943c1', new DateTimeImmutable('1991-11-24 00:00:00')),
@@ -222,7 +225,7 @@ class PagerIteratorTest extends TestCase
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag(['continue' => 'bfdew0_1_1jvdwz4']);
 
-        $this->iterator->setToken(PageToken::fromRequest($request->reveal()));
+        $this->iterator->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
         self::assertEquals([
             new TestObject('af6394a4-7344-4fe8-9748-e6c67eba5ade', new DateTimeImmutable('1991-11-24 03:00:00')),
@@ -300,7 +303,7 @@ class PagerIteratorTest extends TestCase
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag([]);
 
-        $this->iterator->setToken(PageToken::fromRequest($request->reveal()));
+        $this->iterator->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
         self::assertEquals([
             new TestObject('b4902bde-28d2-4ff9-8971-8bfeb3e943c1', new DateTimeImmutable('1991-11-24 00:00:00')),
@@ -313,7 +316,7 @@ class PagerIteratorTest extends TestCase
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag(['continue' => 'bfdc40_2_hzr9o9']);
 
-        $this->iterator->setToken(PageToken::fromRequest($request->reveal()));
+        $this->iterator->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
         $expectedQuery = [
             'query' => [
@@ -494,7 +497,7 @@ class PagerIteratorTest extends TestCase
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag(['continue' => 'bfdew0_1_1jvdwz4']); // This token represents a request with the 02:00:00 timestamp
 
-        $this->iterator->setToken(PageToken::fromRequest($request->reveal()));
+        $this->iterator->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
         self::assertEquals([
             new TestObject('9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', new DateTimeImmutable('1991-11-24 02:30:00')),
@@ -589,7 +592,7 @@ class PagerIteratorTest extends TestCase
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag(['continue' => 'bfdew0_1_1jvdwz4']); // This token represents a request with the 02:00:00 timestamp
 
-        $this->iterator->setToken(PageToken::fromRequest($request->reveal()));
+        $this->iterator->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
         self::assertEquals([
             new TestObject('af6394a4-7344-4fe8-9748-e6c67eba5ade', new DateTimeImmutable('1991-11-24 02:00:00')),
@@ -598,5 +601,145 @@ class PagerIteratorTest extends TestCase
         ], iterator_to_array($this->iterator));
 
         self::assertEquals('bfdkg0_1_7gqxdp', (string) $this->iterator->getNextPageToken());
+    }
+
+    public function testPageOffsetShouldWork(): void
+    {
+        $expectedQuery = [
+            'query' => [
+                'bool' => (object)[],
+            ],
+            '_source' => [
+                'timestamp',
+            ],
+            'sort' => [
+                ['timestamp' => 'asc'],
+                ['id' => 'asc'],
+            ],
+            'size' => 3,
+            'from' => 2,
+            'seq_no_primary_term' => true,
+            'version' => true,
+        ];
+
+        $response = new Response([
+            'took' => 1,
+            'timed_out' => false,
+            '_shards' => [
+                'total' => 4,
+                'successful' => 4,
+                'failed' => 0,
+            ],
+            'hits' => [
+                'total' => 1000,
+                'max_score' => 0.0,
+                'hits' => [
+                    [
+                        '_index' => 'test-object',
+                        '_type' => 'test-object',
+                        '_score' => 1.0,
+                        '_id' => 'af6394a4-7344-4fe8-9748-e6c67eba5ade',
+                        '_source' => [
+                            'timestamp' => '1991-11-24 02:00:00',
+                        ],
+                    ],
+                    [
+                        '_index' => 'test-object',
+                        '_type' => 'test-object',
+                        '_score' => 1.0,
+                        '_id' => '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed',
+                        '_source' => [
+                            'timestamp' => '1991-11-24 03:00:00',
+                        ],
+                    ],
+                    [
+                        '_index' => 'test-object',
+                        '_type' => 'test-object',
+                        '_score' => 1.0,
+                        '_id' => '191a54d8-990c-4ea7-9a23-0aed29d1fffe',
+                        '_source' => [
+                            'timestamp' => '1991-11-24 04:00:00',
+                        ],
+                    ],
+                ],
+            ],
+        ], 200);
+
+        $this->client->request('test-object/_search', 'POST', $expectedQuery, [])
+            ->willReturn($response);
+
+        $this->iterator->setPageSize(3);
+        $this->iterator->setCurrentPage(new PageOffset(2));
+
+        self::assertEquals([
+            new TestObject('af6394a4-7344-4fe8-9748-e6c67eba5ade', new DateTimeImmutable('1991-11-24 02:00:00')),
+            new TestObject('9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', new DateTimeImmutable('1991-11-24 03:00:00')),
+            new TestObject('191a54d8-990c-4ea7-9a23-0aed29d1fffe', new DateTimeImmutable('1991-11-24 04:00:00')),
+        ], iterator_to_array($this->iterator));
+    }
+
+    public function testPageNumberShouldWork(): void
+    {
+        $expectedQuery = [
+            'query' => [
+                'bool' => (object)[],
+            ],
+            '_source' => [
+                'timestamp',
+            ],
+            'sort' => [
+                ['timestamp' => 'asc'],
+                ['id' => 'asc'],
+            ],
+            'size' => 3,
+            'from' => 3,
+            'seq_no_primary_term' => true,
+            'version' => true,
+        ];
+
+        $response = new Response([
+            'took' => 1,
+            'timed_out' => false,
+            '_shards' => [
+                'total' => 4,
+                'successful' => 4,
+                'failed' => 0,
+            ],
+            'hits' => [
+                'total' => 1000,
+                'max_score' => 0.0,
+                'hits' => [
+                    [
+                        '_index' => 'test-object',
+                        '_type' => 'test-object',
+                        '_score' => 1.0,
+                        '_id' => '9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed',
+                        '_source' => [
+                            'timestamp' => '1991-11-24 03:00:00',
+                        ],
+                    ],
+                    [
+                        '_index' => 'test-object',
+                        '_type' => 'test-object',
+                        '_score' => 1.0,
+                        '_id' => '84810e2e-448f-4f58-acb8-4db1381f5de3',
+                        '_source' => [
+                            'timestamp' => '1991-11-24 04:00:00',
+                        ],
+                    ],
+                ],
+            ],
+        ], 200);
+
+        $this->client->request('test-object/_search', 'POST', $expectedQuery, [])
+            ->willReturn($response);
+
+        $this->iterator->setPageSize(3);
+        $this->iterator->setCurrentPage(new PageNumber(2));
+
+        self::assertEquals([
+            new TestObject('9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', new DateTimeImmutable('1991-11-24 03:00:00')),
+            new TestObject('84810e2e-448f-4f58-acb8-4db1381f5de3', new DateTimeImmutable('1991-11-24 04:00:00')),
+        ], iterator_to_array($this->iterator));
     }
 }

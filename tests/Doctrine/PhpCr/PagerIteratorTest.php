@@ -16,12 +16,15 @@ use Jackalope\Query\QOM\NodeLocalName;
 use Jackalope\Query\QOM\Ordering;
 use Jackalope\Query\QOM\QueryObjectModel;
 use Jackalope\Query\QOM\QueryObjectModelFactory;
+use PHPCR\Query\QueryInterface;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Solido\Pagination\Doctrine\PhpCr\PagerIterator;
+use Solido\Pagination\PageNumber;
+use Solido\Pagination\PageOffset;
 use Solido\Pagination\PageToken;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -75,7 +78,7 @@ class PagerIteratorTest extends TestCase
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag([]);
 
-        $this->iterator->setToken(PageToken::fromRequest($request->reveal()));
+        $this->iterator->setCurrentPage(PageToken::fromRequest($request->reveal()));
         $this->dm->getDocumentsByPhpcrQuery(Argument::cetera())->willReturn([
             TestDocument::create('b4902bde-28d2-4ff9-8971-8bfeb3e943c1', new DateTime('1991-11-24 00:00:00')),
             TestDocument::create('191a54d8-990c-4ea7-9a23-0aed29d1fffe', new DateTime('1991-11-24 01:00:00')),
@@ -103,7 +106,7 @@ class PagerIteratorTest extends TestCase
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag(['continue' => 'bfdew0_1_1jvdwz4']);
 
-        $this->iterator->setToken(PageToken::fromRequest($request->reveal()));
+        $this->iterator->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
         self::assertEquals([
             TestDocument::create('af6394a4-7344-4fe8-9748-e6c67eba5ade', new DateTime('1991-11-24 03:00:00')),
@@ -125,7 +128,7 @@ class PagerIteratorTest extends TestCase
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag([]);
 
-        $this->iterator->setToken(PageToken::fromRequest($request->reveal()));
+        $this->iterator->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
         self::assertEquals([
             TestDocument::create('b4902bde-28d2-4ff9-8971-8bfeb3e943c1', new DateTime('1991-11-24 00:00:00')),
@@ -138,7 +141,7 @@ class PagerIteratorTest extends TestCase
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag(['continue' => 'bfdc40_2_hzr9o9']);
 
-        $this->iterator->setToken(PageToken::fromRequest($request->reveal()));
+        $this->iterator->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
         $this->dm->getDocumentsByPhpcrQuery(Argument::cetera())->willReturn([
             (object) TestDocument::create('191a54d8-990c-4ea7-9a23-0aed29d1fffe', new DateTime('1991-11-24 01:00:00')),
@@ -167,7 +170,7 @@ class PagerIteratorTest extends TestCase
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag(['continue' => 'bfdew0_1_1jvdwz4']); // This token represents a request with the 02:00:00 timestamp
 
-        $this->iterator->setToken(PageToken::fromRequest($request->reveal()));
+        $this->iterator->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
         self::assertEquals([
             TestDocument::create('9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', new DateTime('1991-11-24 02:30:00')),
@@ -190,7 +193,7 @@ class PagerIteratorTest extends TestCase
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag(['continue' => 'bfdew0_1_183tket']); // This token represents a request with the 02:00:00 timestamp
 
-        $this->iterator->setToken(PageToken::fromRequest($request->reveal()));
+        $this->iterator->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
         self::assertEquals([
             TestDocument::create('af6394a4-7344-4fe8-9748-e6c67eba5ade', new DateTime('1991-11-24 02:00:00')),
@@ -230,7 +233,7 @@ class PagerIteratorTest extends TestCase
         $request = $this->prophesize(Request::class);
         $request->query = new ParameterBag(['continue' => '=Zm9vYmFy_1_68lkk0']); // This token represents a request with the 02:00:00 timestamp
 
-        $this->iterator->setToken(PageToken::fromRequest($request->reveal()));
+        $this->iterator->setCurrentPage(PageToken::fromRequest($request->reveal()));
         $this->dm->getDocumentsByPhpcrQuery(Argument::that(static function (QueryObjectModel $arg) {
             $orderings = $arg->getOrderings();
 
@@ -250,6 +253,49 @@ class PagerIteratorTest extends TestCase
             ->shouldBeCalled();
 
         iterator_to_array($this->iterator);
+    }
+
+    public function testPageOffsetShouldWork(): void
+    {
+        $this->iterator->setPageSize(3);
+        $this->dm->getDocumentsByPhpcrQuery(Argument::that(function (QueryObjectModel $query) {
+            Assert::assertEquals(2, $query->getOffset());
+            Assert::assertEquals(3, $query->getLimit());
+
+            return true;
+        }), Argument::cetera())->willReturn([
+            TestDocument::create('eadd7470-95f5-47e8-8e74-083d45c307f6', new DateTime('1991-11-24 02:00:00')),
+            TestDocument::create('9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', new DateTime('1991-11-24 01:00:00')),
+            TestDocument::create('84810e2e-448f-4f58-acb8-4db1381f5de3', new DateTime('1991-11-24 01:00:00')),
+        ]);
+
+        $this->iterator->setCurrentPage(new PageOffset(2));
+        self::assertEquals([
+            TestDocument::create('eadd7470-95f5-47e8-8e74-083d45c307f6', new DateTime('1991-11-24 02:00:00')),
+            TestDocument::create('9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', new DateTime('1991-11-24 01:00:00')),
+            TestDocument::create('84810e2e-448f-4f58-acb8-4db1381f5de3', new DateTime('1991-11-24 01:00:00')),
+        ], iterator_to_array($this->iterator));
+    }
+
+    public function testPageNumberShouldWork(): void
+    {
+        $this->iterator->setPageSize(3);
+        $this->dm->getDocumentsByPhpcrQuery(Argument::that(function (QueryObjectModel $query) {
+            Assert::assertEquals(3, $query->getOffset());
+            Assert::assertEquals(3, $query->getLimit());
+
+            return true;
+        }), Argument::cetera())->willReturn([
+            TestDocument::create('9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', new DateTime('1991-11-24 01:00:00')),
+            TestDocument::create('84810e2e-448f-4f58-acb8-4db1381f5de3', new DateTime('1991-11-24 01:00:00')),
+        ]);
+
+        $this->iterator->setCurrentPage(new PageNumber(2));
+
+        self::assertEquals([
+            TestDocument::create('9c5f6ff7-b28f-48fb-ba47-8bcc3b235bed', new DateTime('1991-11-24 01:00:00')),
+            TestDocument::create('84810e2e-448f-4f58-acb8-4db1381f5de3', new DateTime('1991-11-24 01:00:00')),
+        ], iterator_to_array($this->iterator));
     }
 }
 

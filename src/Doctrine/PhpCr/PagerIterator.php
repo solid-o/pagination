@@ -17,11 +17,16 @@ use Doctrine\ODM\PHPCR\Query\Builder\SourceDocument;
 use ReflectionMethod;
 use Refugis\DoctrineExtra\ObjectIteratorInterface;
 use Refugis\DoctrineExtra\ODM\PhpCr\IteratorTrait;
+use RuntimeException;
 use Solido\Pagination\Orderings;
+use Solido\Pagination\PageNumber;
+use Solido\Pagination\PageOffset;
 use Solido\Pagination\PagerIterator as BaseIterator;
+use Solido\Pagination\PageToken;
 
 use function array_values;
 use function assert;
+use function count;
 use function is_array;
 use function is_string;
 use function iterator_to_array;
@@ -34,7 +39,7 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
      * @param Orderings|string[]|string[][] $orderBy
      * @phpstan-param Orderings|array<string>|array<string, 'asc'|'desc'>|array<array{string, 'asc'|'desc'}> $orderBy
      */
-    public function __construct(QueryBuilder $searchable, Orderings|array $orderBy)
+    public function __construct(QueryBuilder $searchable, Orderings|array $orderBy = new Orderings([]))
     {
         $this->queryBuilder = clone $searchable;
         $this->totalCount = null;
@@ -58,6 +63,18 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
 
         $this->current = null;
         $this->currentElement = parent::current();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function filterObjects(array $objects): array
+    {
+        if ($this->currentPage instanceof PageToken) {
+            return parent::filterObjects($objects);
+        }
+
+        return $objects;
     }
 
     /**
@@ -100,9 +117,13 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
         }
 
         $limit = $this->pageSize;
-        if ($this->token !== null) {
-            $timestamp = $this->token->getOrderValue();
-            $limit += $this->token->getOffset();
+        if ($this->currentPage instanceof PageToken) {
+            if (count($this->orderBy) < 2) {
+                throw new RuntimeException('orderBy must have at least 2 "field" => "direction(ASC|DESC)". The first is the reference timestamp, the second is the checksum field.');
+            }
+
+            $timestamp = $this->currentPage->getOrderValue();
+            $limit += $this->currentPage->getOffset();
             $mainOrder = $this->orderBy[0];
 
             /** @phpstan-var class-string $sourceFqn */
@@ -126,6 +147,12 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
 
             assert($factory instanceof OperandFactory);
             $factory->literal($timestamp);
+        } elseif ($this->currentPage instanceof PageNumber) {
+            $offset = ($this->currentPage->getPageNumber() - 1) * $limit;
+            $queryBuilder->setFirstResult($offset);
+        } elseif ($this->currentPage instanceof PageOffset) {
+            $offset = $this->currentPage->getOffset();
+            $queryBuilder->setFirstResult($offset);
         }
 
         $queryBuilder->setMaxResults($limit);

@@ -7,6 +7,7 @@ namespace Solido\Pagination;
 use Closure;
 use Generator;
 use Iterator;
+use LogicException;
 use ReturnTypeWillChange;
 use RuntimeException;
 use Solido\Pagination\Accessor\DateTimeValueAccessor;
@@ -48,9 +49,9 @@ class PagerIterator implements Iterator
     protected int $pageSize;
 
     /**
-     * The current continuation token.
+     * The current page token/number/offset.
      */
-    protected PageToken|null $token;
+    protected PageToken|PageNumber|PageOffset|null $currentPage;
 
     /**
      * The object array to be paginated.
@@ -72,14 +73,10 @@ class PagerIterator implements Iterator
     public function __construct(iterable $objects, Orderings|array $orderBy = new Orderings([]))
     {
         $this->pageSize = self::DEFAULT_PAGE_SIZE;
-        $this->token = null;
+        $this->currentPage = null;
         $this->page = null;
         $this->valid = false;
         $this->orderBy = $orderBy instanceof Orderings ? $orderBy : new Orderings($orderBy);
-
-        if (count($this->orderBy) < 2) {
-            throw new RuntimeException('orderBy must have at least 2 "field" => "direction(ASC|DESC)". The first is the reference timestamp, the second is the checksum field.');
-        }
 
         $objects = is_array($objects) ? $objects : iterator_to_array($objects);
         uasort($objects, Closure::fromCallable([$this, 'sort']));
@@ -91,7 +88,7 @@ class PagerIterator implements Iterator
      * Return the current element.
      */
     #[ReturnTypeWillChange]
-    public function current()
+    public function current() // phpcs:ignore SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingAnyTypeHint
     {
         assert($this->page !== null);
 
@@ -108,7 +105,6 @@ class PagerIterator implements Iterator
     /**
      * Return the key of the current element
      */
-    #[ReturnTypeWillChange]
     public function key(): mixed
     {
         assert($this->page !== null);
@@ -145,13 +141,13 @@ class PagerIterator implements Iterator
     }
 
     /**
-     * Sets the continuation token.
+     * Sets the current page.
      *
      * @return $this
      */
-    public function setToken(PageToken|null $token): self
+    public function setCurrentPage(PageToken|PageNumber|PageOffset|null $currentPage): self
     {
-        $this->token = $token;
+        $this->currentPage = $currentPage;
         $this->page = null;
 
         return $this;
@@ -195,16 +191,35 @@ class PagerIterator implements Iterator
      */
     protected function filterObjects(array $objects): array
     {
-        $order = $this->orderBy[0];
+        assert($this->currentPage !== null);
 
-        assert($this->token !== null);
-        $referenceTimestamp = $this->token->getOrderValue();
+        switch (true) {
+            case $this->currentPage instanceof PageToken:
+                if (count($this->orderBy) < 2) {
+                    throw new RuntimeException('orderBy must have at least 2 "field" => "direction(ASC|DESC)". The first is the reference timestamp, the second is the checksum field.');
+                }
 
-        return array_filter($objects, static function ($entity) use ($order, $referenceTimestamp) {
-            $value = static::getAccessor()->getValue($entity, $order[0]);
+                $order = $this->orderBy[0];
+                $referenceTimestamp = $this->currentPage->getOrderValue();
 
-            return $order[1] === Orderings::SORT_ASC ? $value >= $referenceTimestamp : $value <= $referenceTimestamp;
-        });
+                return array_filter($objects, static function ($entity) use ($order, $referenceTimestamp) {
+                    $value = static::getAccessor()->getValue($entity, $order[0]);
+
+                    return $order[1] === Orderings::SORT_ASC ? $value >= $referenceTimestamp : $value <= $referenceTimestamp;
+                });
+
+            case $this->currentPage instanceof PageOffset:
+                $offset = $this->currentPage->getOffset();
+
+                return array_slice($objects, $offset);
+
+            case $this->currentPage instanceof PageNumber:
+                $offset = ($this->currentPage->getPageNumber() - 1) * $this->pageSize;
+
+                return array_slice($objects, $offset);
+        }
+
+        throw new LogicException('Unreachable statement');
     }
 
     /**
@@ -215,13 +230,13 @@ class PagerIterator implements Iterator
      */
     protected function checksumDiffers(array $objects): bool
     {
-        assert($this->token !== null);
-        $head = array_slice($objects, 0, $this->token->getOffset());
+        assert($this->currentPage instanceof PageToken);
+        $head = array_slice($objects, 0, $this->currentPage->getOffset());
 
         $referenceObjects = $this->getLastObjectsWithCommonTimestamp($head);
         $referenceChecksum = $this->getChecksumForObjects($referenceObjects);
 
-        return $this->token->getChecksum() !== $referenceChecksum;
+        return $this->currentPage->getChecksum() !== $referenceChecksum;
     }
 
     /**
@@ -232,10 +247,10 @@ class PagerIterator implements Iterator
      */
     protected function orderValueDiffers(array $objects): bool
     {
-        assert($this->token !== null);
+        assert($this->currentPage instanceof PageToken);
         $reference = reset($objects);
 
-        return $this->getOrderValueForObject($reference) !== $this->token->getOrderValue();
+        return $this->getOrderValueForObject($reference) !== $this->currentPage->getOrderValue();
     }
 
     /**
@@ -279,7 +294,7 @@ class PagerIterator implements Iterator
             return [];
         }
 
-        if ($this->token === null) {
+        if ($this->currentPage === null) {
             //First call: continuous token is not present, so we return the first page of objects
             return array_slice($objects, 0, $this->pageSize);
         }
@@ -289,17 +304,21 @@ class PagerIterator implements Iterator
             return [];
         }
 
-        if ($this->orderValueDiffers($objects) || $this->checksumDiffers($objects)) {
-            // Fallback: deliver all the first-page of the filtered elements involved (the elements >= timestamp requested)
-            return array_slice($objects, 0, $this->pageSize);
+        if ($this->currentPage instanceof PageToken) {
+            if ($this->orderValueDiffers($objects) || $this->checksumDiffers($objects)) {
+                // Fallback: deliver all the first-page of the filtered elements involved (the elements >= timestamp requested)
+                return array_slice($objects, 0, $this->pageSize);
+            }
+
+            /*
+             * else: return the page taking into account the offset of the previous request:
+             *  This means multiple objects have the same timestamp and different offset, so this value
+             *  must be taken into account
+             */
+            return array_slice($objects, $this->currentPage->getOffset(), $this->pageSize);
         }
 
-        /*
-         * else: return the page taking into account the offset of the previous request:
-         *  This means multiple objects have the same timestamp and different offset, so this value
-         *  must be taken into account
-         */
-        return array_slice($objects, $this->token->getOffset(), $this->pageSize);
+        return array_slice($objects, 0, $this->pageSize);
     }
 
     /**
