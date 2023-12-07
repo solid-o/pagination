@@ -26,6 +26,7 @@ jobs:
                   tools: 'infection'
                   ini-values: zend.assertions=1,assert.exception=1,assert.active=1
                   coverage: pcov
+                  extensions: :psr
 
             - run: composer install
             - run: vendor/bin/phpunit --coverage-clover phpunit/phpunit.coverage.xml --coverage-xml phpunit/coverage-xml --log-junit phpunit/junit.xml

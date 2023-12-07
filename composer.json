@@ -21,7 +21,7 @@
     "require": {
         "php": "^8.1",
         "solido/common": "^0.4",
-        "symfony/property-access": "^5.4 || ^6.0"
+        "symfony/property-access": "^5.4 || ^6.0 || ^7.0"
     },
     "require-dev": {
         "doctrine/annotations": "^2.0",
@@ -37,8 +37,8 @@
         "roave/security-advisories": "dev-master",
         "solido/php-coding-standards": "dev-master",
         "solido/test-utils": "dev-master",
-        "symfony/cache": "^5.4 || ^6.0",
-        "symfony/http-foundation": "^5.4 || ^6.0",
+        "symfony/cache": "^5.4 || ^6.0 || ^7.0",
+        "symfony/http-foundation": "^5.4 || ^6.0 || ^7.0",
         "symfony/var-dumper": "*"
     },
     "autoload": {

@@ -26,7 +26,7 @@ use Solido\Pagination\Doctrine\PhpCr\PagerIterator;
 use Solido\Pagination\PageNumber;
 use Solido\Pagination\PageOffset;
 use Solido\Pagination\PageToken;
-use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 
 use function assert;
@@ -76,7 +76,7 @@ class PagerIteratorTest extends TestCase
     public function testPagerShouldGenerateFirstPageWithToken(): void
     {
         $request = $this->prophesize(Request::class);
-        $request->query = new ParameterBag([]);
+        $request->query = new InputBag([]);
 
         $this->iterator->setCurrentPage(PageToken::fromRequest($request->reveal()));
         $this->dm->getDocumentsByPhpcrQuery(Argument::cetera())->willReturn([
@@ -104,7 +104,7 @@ class PagerIteratorTest extends TestCase
         ]);
 
         $request = $this->prophesize(Request::class);
-        $request->query = new ParameterBag(['continue' => 'bfdew0_1_1jvdwz4']);
+        $request->query = new InputBag(['continue' => 'bfdew0_1_1jvdwz4']);
 
         $this->iterator->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
@@ -126,7 +126,7 @@ class PagerIteratorTest extends TestCase
         ]);
 
         $request = $this->prophesize(Request::class);
-        $request->query = new ParameterBag([]);
+        $request->query = new InputBag([]);
 
         $this->iterator->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
@@ -139,7 +139,7 @@ class PagerIteratorTest extends TestCase
         self::assertEquals(2, $this->iterator->getNextPageToken()->getOffset());
 
         $request = $this->prophesize(Request::class);
-        $request->query = new ParameterBag(['continue' => 'bfdc40_2_hzr9o9']);
+        $request->query = new InputBag(['continue' => 'bfdc40_2_hzr9o9']);
 
         $this->iterator->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
@@ -168,7 +168,7 @@ class PagerIteratorTest extends TestCase
         ]);
 
         $request = $this->prophesize(Request::class);
-        $request->query = new ParameterBag(['continue' => 'bfdew0_1_1jvdwz4']); // This token represents a request with the 02:00:00 timestamp
+        $request->query = new InputBag(['continue' => 'bfdew0_1_1jvdwz4']); // This token represents a request with the 02:00:00 timestamp
 
         $this->iterator->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
@@ -191,7 +191,7 @@ class PagerIteratorTest extends TestCase
         ]);
 
         $request = $this->prophesize(Request::class);
-        $request->query = new ParameterBag(['continue' => 'bfdew0_1_183tket']); // This token represents a request with the 02:00:00 timestamp
+        $request->query = new InputBag(['continue' => 'bfdew0_1_183tket']); // This token represents a request with the 02:00:00 timestamp
 
         $this->iterator->setCurrentPage(PageToken::fromRequest($request->reveal()));
 
@@ -231,7 +231,7 @@ class PagerIteratorTest extends TestCase
         self::assertEquals('=Zm9vYmFy_1_68lkk0', (string) $this->iterator->getNextPageToken());
 
         $request = $this->prophesize(Request::class);
-        $request->query = new ParameterBag(['continue' => '=Zm9vYmFy_1_68lkk0']); // This token represents a request with the 02:00:00 timestamp
+        $request->query = new InputBag(['continue' => '=Zm9vYmFy_1_68lkk0']); // This token represents a request with the 02:00:00 timestamp
 
         $this->iterator->setCurrentPage(PageToken::fromRequest($request->reveal()));
         $this->dm->getDocumentsByPhpcrQuery(Argument::that(static function (QueryObjectModel $arg) {
