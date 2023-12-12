@@ -170,6 +170,10 @@ class PagerIterator implements Iterator
             return null;
         }
 
+        if (count($this->orderBy) < 2) {
+            return null;
+        }
+
         $refObjects = iterator_to_array($this->getLastObjectsWithCommonTimestamp($this->page), false);
 
         return new PageToken($this->getOrderValueForObject($refObjects[0]), count($refObjects), $this->getChecksumForObjects($refObjects));
