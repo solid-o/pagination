@@ -161,7 +161,7 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
 
             $direction = $mainOrder[0][1] === Orderings::SORT_ASC ? '>=' : '<=';
             $queryBuilder->andWhere($mainOrder[0][0] . ' ' . $direction . ' :timeLimit');
-            $queryBuilder->setParameter('timeLimit', $timestamp, $type?->getName());
+            $queryBuilder->setParameter('timeLimit', $timestamp, $type !== null ? self::lookupTypeName($type) : null);
         } elseif ($this->currentPage instanceof PageNumber) {
             $offset = ($this->currentPage->getPageNumber() - 1) * $limit;
             $queryBuilder->setFirstResult($offset);
@@ -180,5 +180,14 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
         }
 
         return $query->getResult();
+    }
+
+    private static function lookupTypeName(Type $type): string
+    {
+        if (method_exists(Type::class, 'lookupName')) {
+            return Type::lookupName($type);
+        }
+
+        return $type->getName();
     }
 }
