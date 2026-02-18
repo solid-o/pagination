@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Solido\Pagination\Doctrine\ORM;
 
 use DateTimeImmutable;
+use Doctrine\DBAL\Types\DateTimeImmutableType;
 use Doctrine\DBAL\Types\DateTimeType;
+use Doctrine\DBAL\Types\DateTimeTzImmutableType;
 use Doctrine\DBAL\Types\DateTimeTzType;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -155,7 +157,8 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
                 $type = Type::getType($type);
             }
 
-            if ($type instanceof DateTimeType || $type instanceof DateTimeTzType) {
+            if ($type instanceof DateTimeType || $type instanceof DateTimeTzType ||
+                $type instanceof DateTimeImmutableType || $type instanceof DateTimeTzImmutableType) {
                 $timestamp = DateTimeImmutable::createFromFormat('U', (string) $timestamp);
             }
 
