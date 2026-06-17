@@ -19,9 +19,9 @@
         "csfix": "vendor/bin/phpcbf --standard=Solido src/"
     },
     "require": {
-        "php": "^8.1",
-        "solido/common": "^0.4",
-        "symfony/property-access": "^5.4 || ^6.0 || ^7.0"
+        "php": "^8.4",
+        "solido/common": "^0.4 || ^0.5",
+        "symfony/property-access": "^7.4 || ^8.0"
     },
     "require-dev": {
         "doctrine/annotations": "^2.0",
@@ -30,16 +30,16 @@
         "doctrine/phpcr-odm": "^1.5 || ^2.0",
         "friendsofphp/proxy-manager-lts": "^1.0",
         "jackalope/jackalope-doctrine-dbal": "^1.4 || ^2.0",
-        "phpunit/phpunit": "^10.0 || ^11.0",
+        "phpunit/phpunit": "^11.0 || ^12.0",
         "psr/http-message": "^1.0",
         "refugis/doctrine-extra": "^2.4 || ^3.0",
         "refugis/elastica-odm": "2.x-dev",
         "roave/security-advisories": "dev-master",
         "solido/php-coding-standards": "dev-master",
         "solido/test-utils": "dev-master",
-        "symfony/cache": "^5.4 || ^6.0 || ^7.0",
-        "symfony/http-foundation": "^5.4 || ^6.0 || ^7.0",
-        "symfony/var-dumper": "*"
+        "symfony/cache": "^7.4 || ^8.0",
+        "symfony/http-foundation": "^7.4 || ^8.0",
+        "symfony/var-dumper": "^7.4 || ^8.0"
     },
     "autoload": {
         "psr-4": {
@@ -64,7 +64,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "0.4.x-dev"
+            "dev-master": "0.5.x-dev"
         }
     }
 }
