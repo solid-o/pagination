@@ -8,10 +8,8 @@ use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\PHPCR\DocumentManagerInterface;
 use Doctrine\ODM\PHPCR\Query\Builder\AbstractNode;
-use Doctrine\ODM\PHPCR\Query\Builder\ConstraintComparison;
 use Doctrine\ODM\PHPCR\Query\Builder\ConverterPhpcr;
 use Doctrine\ODM\PHPCR\Query\Builder\From;
-use Doctrine\ODM\PHPCR\Query\Builder\OperandFactory;
 use Doctrine\ODM\PHPCR\Query\Builder\QueryBuilder;
 use Doctrine\ODM\PHPCR\Query\Builder\SourceDocument;
 use Doctrine\ODM\PHPCR\Query\Builder\SourceJoin;
@@ -29,7 +27,6 @@ use function array_values;
 use function assert;
 use function count;
 use function is_array;
-use function is_string;
 use function iterator_to_array;
 
 final class PagerIterator extends BaseIterator implements ObjectIteratorInterface
@@ -108,9 +105,7 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
 
         /** @phpstan-var class-string $documentFqn */
         $documentFqn = $source->getDocumentFqn();
-        assert(is_string($documentFqn));
 
-        assert($documentManager instanceof DocumentManagerInterface);
         $classMetadata = $documentManager->getClassMetadata($documentFqn);
 
         foreach ($this->orderBy as $key => [$field, $direction]) {
@@ -135,7 +130,6 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
 
             /** @phpstan-var class-string $sourceFqn */
             $sourceFqn = $source->getDocumentFqn();
-            assert(is_string($sourceFqn));
 
             $type = $documentManager->getClassMetadata($sourceFqn)->getTypeOfField($mainOrder[0]);
             if ($type === 'date') {
@@ -144,16 +138,14 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
 
             $direction = $mainOrder[1] === Orderings::SORT_ASC ? 'gte' : 'lte';
             $ordering = $queryBuilder->andWhere()->{$direction}();
-            assert($ordering instanceof ConstraintComparison);
 
             if ($classMetadata->getTypeOfField($mainOrder[0]) === 'nodename') {
-                $factory = $ordering->localName($alias);
+                $ordering->localName($alias);
             } else {
-                $factory = $ordering->field($alias . '.' . $mainOrder[0]);
+                $ordering->field($alias . '.' . $mainOrder[0]);
             }
 
-            assert($factory instanceof OperandFactory);
-            $factory->literal($timestamp);
+            $ordering->literal($timestamp);
         } elseif ($this->currentPage instanceof PageNumber) {
             $offset = ($this->currentPage->getPageNumber() - 1) * $limit;
             $queryBuilder->setFirstResult($offset);

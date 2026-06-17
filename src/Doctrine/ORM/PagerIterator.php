@@ -37,8 +37,8 @@ use function var_export;
 
 final class PagerIterator extends BaseIterator implements ObjectIteratorInterface
 {
-    public const FETCH_EAGER = 'EAGER';
-    public const FETCH_LAZY = 'LAZY';
+    public const string FETCH_EAGER = 'EAGER';
+    public const string FETCH_LAZY = 'LAZY';
     use IteratorTrait;
 
     /**
@@ -157,8 +157,10 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
                 $type = Type::getType($type);
             }
 
-            if ($type instanceof DateTimeType || $type instanceof DateTimeTzType ||
-                $type instanceof DateTimeImmutableType || $type instanceof DateTimeTzImmutableType) {
+            if (
+                $type instanceof DateTimeType || $type instanceof DateTimeTzType ||
+                $type instanceof DateTimeImmutableType || $type instanceof DateTimeTzImmutableType
+            ) {
                 $timestamp = DateTimeImmutable::createFromFormat('U', (string) $timestamp);
             }
 
@@ -187,10 +189,6 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
 
     private static function lookupTypeName(Type $type): string
     {
-        if (method_exists(Type::class, 'lookupName')) {
-            return Type::lookupName($type);
-        }
-
-        return $type->getName();
+        return Type::lookupName($type);
     }
 }

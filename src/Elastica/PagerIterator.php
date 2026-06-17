@@ -20,6 +20,7 @@ use Solido\Pagination\PageToken;
 
 use function assert;
 use function is_string;
+use function max;
 use function Safe\sprintf;
 
 final class PagerIterator extends BaseIterator implements ObjectIteratorInterface
@@ -27,6 +28,8 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
     use IteratorTrait;
 
     private Search $search;
+
+    /** @var int<0, max>|null */
     private int|null $totalCount;
 
     /**
@@ -46,7 +49,7 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
     public function count(): int
     {
         if ($this->totalCount === null) {
-            $this->totalCount = $this->search->count();
+            $this->totalCount = max(0, $this->search->count());
         }
 
         return $this->totalCount;
@@ -114,7 +117,6 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
 
             /** @phpstan-var class-string $documentClass */
             $documentClass = $this->search->getDocumentClass();
-            assert(is_string($documentClass));
 
             $typeName = $documentManager->getClassMetadata($documentClass)->getTypeOfField($mainOrder[0]);
             if ($typeName === null) {

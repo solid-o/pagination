@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Solido\Pagination\Doctrine\DBAL;
 
 use BadMethodCallException;
-use Doctrine\DBAL\Driver\ResultStatement;
-use Doctrine\DBAL\FetchMode;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ObjectManager;
@@ -20,11 +18,8 @@ use Solido\Pagination\PagerIterator as BaseIterator;
 use Solido\Pagination\PageToken;
 
 use function array_map;
-use function assert;
 use function call_user_func;
-use function class_exists;
 use function count;
-use function is_callable;
 use function is_object;
 use function json_decode;
 use function json_encode;
@@ -57,7 +52,6 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
         }
 
         if ($this->current === null) {
-            assert(is_callable($this->callable));
             $this->current = call_user_func($this->callable, $this->currentElement);
         }
 
@@ -128,13 +122,6 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
         }
 
         $queryBuilder->setMaxResults($limit);
-        if (class_exists(ResultStatement::class)) {
-            $stmt = $queryBuilder->execute();
-            assert($stmt instanceof ResultStatement);
-
-            return $stmt->fetchAll(FetchMode::STANDARD_OBJECT); /* @phpstan-ignore-line */
-        }
-
         $result = $queryBuilder->executeQuery();
 
         return array_map(static fn (array $d): object => (object) $d, $result->fetchAllAssociative());

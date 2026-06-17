@@ -7,7 +7,6 @@ namespace Solido\Pagination;
 use Closure;
 use Generator;
 use Iterator;
-use LogicException;
 use ReturnTypeWillChange;
 use RuntimeException;
 use Solido\Pagination\Accessor\DateTimeValueAccessor;
@@ -27,7 +26,6 @@ use function crc32;
 use function current;
 use function implode;
 use function is_array;
-use function is_object;
 use function iterator_to_array;
 use function key;
 use function next;
@@ -36,7 +34,7 @@ use function uasort;
 
 class PagerIterator implements Iterator
 {
-    public const DEFAULT_PAGE_SIZE = 10;
+    public const int DEFAULT_PAGE_SIZE = 10;
 
     /**
      * Ordering information holder.
@@ -221,13 +219,11 @@ class PagerIterator implements Iterator
 
                 return array_slice($objects, $offset);
 
-            case $this->currentPage instanceof PageNumber:
+            default:
                 $offset = ($this->currentPage->getPageNumber() - 1) * $this->pageSize;
 
                 return array_slice($objects, $offset);
         }
-
-        throw new LogicException('Unreachable statement');
     }
 
     /**
@@ -373,7 +369,6 @@ class PagerIterator implements Iterator
         $valueAccessor = static::getAccessor();
 
         foreach ($objects as $object) {
-            assert(is_object($object));
             $idArray[] = $valueAccessor->getValue($object, $order[0]);
         }
 

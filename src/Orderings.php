@@ -22,8 +22,8 @@ use function strtolower;
  */
 final class Orderings implements Countable, IteratorAggregate, ArrayAccess
 {
-    public const SORT_ASC = 'asc';
-    public const SORT_DESC = 'desc';
+    public const string SORT_ASC = 'asc';
+    public const string SORT_DESC = 'desc';
 
     /** @var array<array<string>> */
     private array $orderings;

@@ -38,7 +38,7 @@ use function substr;
  */
 final class PageToken
 {
-    public const TOKEN_DELIMITER = '_';
+    public const string TOKEN_DELIMITER = '_';
 
     public function __construct(
         /**
