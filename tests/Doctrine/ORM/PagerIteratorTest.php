@@ -8,7 +8,6 @@ use DateTimeImmutable;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use PHPUnit\Framework\TestCase;
-use ReflectionProperty;
 use Solido\Pagination\Doctrine\ORM\PagerIterator;
 use Solido\Pagination\PageNumber;
 use Solido\Pagination\PageOffset;
@@ -33,7 +32,6 @@ class PagerIteratorTest extends TestCase
     {
         $this->_entityManager = null;
         $metadata = new ClassMetadata(RelatedTestObject::class);
-        $this->getEntityManager()->getMetadataFactory()->setMetadataFor(RelatedTestObject::class, $metadata);
         $metadata->identifier = ['id'];
         $metadata->mapField([
             'fieldName' => 'id',
@@ -44,10 +42,9 @@ class PagerIteratorTest extends TestCase
             'nullable' => false,
             'precision' => null,
         ]);
-        $metadata->reflFields['id'] = new ReflectionProperty(TestObject::class, 'id');
+        $this->getEntityManager()->getMetadataFactory()->setMetadataFor(RelatedTestObject::class, $metadata);
 
         $metadata = new ClassMetadata(TestObject::class);
-        $this->getEntityManager()->getMetadataFactory()->setMetadataFor(TestObject::class, $metadata);
 
         $metadata->identifier = ['id'];
         $metadata->mapField([
@@ -74,10 +71,7 @@ class PagerIteratorTest extends TestCase
             'fieldName' => 'related',
             'targetEntity' => RelatedTestObject::class,
         ]);
-
-        $metadata->reflFields['id'] = new ReflectionProperty(TestObject::class, 'id');
-        $metadata->reflFields['timestamp'] = new ReflectionProperty(TestObject::class, 'timestamp');
-        $metadata->reflFields['related'] = new ReflectionProperty(TestObject::class, 'related');
+        $this->getEntityManager()->getMetadataFactory()->setMetadataFor(TestObject::class, $metadata);
 
         $this->queryBuilder = $this->getEntityManager()->createQueryBuilder();
         $this->queryBuilder->select('a')
