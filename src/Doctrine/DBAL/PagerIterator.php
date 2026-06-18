@@ -27,6 +27,7 @@ use function strtoupper;
 
 use const JSON_THROW_ON_ERROR;
 
+/** @implements ObjectIteratorInterface<mixed> */
 final class PagerIterator extends BaseIterator implements ObjectIteratorInterface
 {
     use IteratorTrait;

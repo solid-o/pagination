@@ -19,14 +19,15 @@ use Solido\Pagination\PagerIterator as BaseIterator;
 use Solido\Pagination\PageToken;
 
 use function assert;
-use function is_string;
 use function max;
 use function Safe\sprintf;
 
+/** @implements ObjectIteratorInterface<mixed> */
 final class PagerIterator extends BaseIterator implements ObjectIteratorInterface
 {
     use IteratorTrait;
 
+    /** @var Search<object> */
     private Search $search;
 
     /** @var int<0, max>|null */
@@ -34,6 +35,7 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
 
     /**
      * @param Orderings|string[]|string[][] $orderBy
+     * @param Search<object> $search
      * @phpstan-param Orderings|array<string>|array<string, 'asc'|'desc'>|array<array{string, 'asc'|'desc'}> $orderBy
      */
     public function __construct(Search $search, Orderings|array $orderBy)
@@ -93,8 +95,6 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
         $sort = [];
 
         foreach ($this->orderBy as [$field, $direction]) {
-            assert(is_string($field));
-            assert(is_string($direction));
             $sort[$field] = $direction;
         }
 

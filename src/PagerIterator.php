@@ -32,6 +32,7 @@ use function next;
 use function reset;
 use function uasort;
 
+/** @implements Iterator<int|string|null, object|false|null> */
 class PagerIterator implements Iterator
 {
     public const int DEFAULT_PAGE_SIZE = 10;

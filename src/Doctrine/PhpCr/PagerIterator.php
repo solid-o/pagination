@@ -29,6 +29,7 @@ use function count;
 use function is_array;
 use function iterator_to_array;
 
+/** @implements ObjectIteratorInterface<mixed> */
 final class PagerIterator extends BaseIterator implements ObjectIteratorInterface
 {
     use IteratorTrait;
@@ -157,7 +158,7 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
         $queryBuilder->setMaxResults($limit);
 
         // phpcs:disable SlevomatCodingStandard.PHP.RequireExplicitAssertion.RequiredExplicitAssertion
-        /** @var array|ArrayCollection $result */
+        /** @var array<int, object>|ArrayCollection<int, object> $result */
         $result = $queryBuilder->getQuery()->getResult();
         // phpcs:enable
 

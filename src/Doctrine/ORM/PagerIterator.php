@@ -35,6 +35,7 @@ use function strpos;
 use function strtoupper;
 use function var_export;
 
+/** @implements ObjectIteratorInterface<mixed> */
 final class PagerIterator extends BaseIterator implements ObjectIteratorInterface
 {
     public const string FETCH_EAGER = 'EAGER';
@@ -164,7 +165,7 @@ final class PagerIterator extends BaseIterator implements ObjectIteratorInterfac
                 $timestamp = DateTimeImmutable::createFromFormat('U', (string) $timestamp);
             }
 
-            $direction = $mainOrder[0][1] === Orderings::SORT_ASC ? '>=' : '<=';
+            $direction = ($mainOrder[0][1] ?? Orderings::SORT_ASC) === Orderings::SORT_ASC ? '>=' : '<=';
             $queryBuilder->andWhere($mainOrder[0][0] . ' ' . $direction . ' :timeLimit');
             $queryBuilder->setParameter('timeLimit', $timestamp, $type !== null ? self::lookupTypeName($type) : null);
         } elseif ($this->currentPage instanceof PageNumber) {

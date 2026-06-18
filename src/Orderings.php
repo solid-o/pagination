@@ -19,13 +19,16 @@ use function strtolower;
 
 /**
  * Represents the orderings set for pager.
+ *
+ * @implements ArrayAccess<int, array{0: string, 1: string}>
+ * @implements IteratorAggregate<int, array{0: string, 1: string}>
  */
 final class Orderings implements Countable, IteratorAggregate, ArrayAccess
 {
     public const string SORT_ASC = 'asc';
     public const string SORT_DESC = 'desc';
 
-    /** @var array<array<string>> */
+    /** @var array<int, array{0: string, 1: string}> */
     private array $orderings;
 
     /**
@@ -42,6 +45,7 @@ final class Orderings implements Countable, IteratorAggregate, ArrayAccess
         $this->orderings = self::normalize($orderings);
     }
 
+    /** @return Generator<int, array{0: string, 1: string}> */
     public function getIterator(): Generator
     {
         yield from $this->orderings;
@@ -66,7 +70,7 @@ final class Orderings implements Countable, IteratorAggregate, ArrayAccess
     /**
      * Offset to retrieve
      *
-     * @return array<string>
+     * @return array{0: string, 1: string}
      */
     public function offsetGet(mixed $offset): array
     {
@@ -95,7 +99,7 @@ final class Orderings implements Countable, IteratorAggregate, ArrayAccess
      * @param string[]|string[][] $orderings
      * @phpstan-param array<string>|array<string, 'asc'|'desc'>|array<array{string, 'asc'|'desc'}> $orderings
      *
-     * @return array<array<string>>
+     * @return array<int, array{0: string, 1: string}>
      */
     private static function normalize(array $orderings): array
     {
